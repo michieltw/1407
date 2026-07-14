@@ -1,0 +1,122 @@
+<!-- VIEW: BOXSCORE (Premium Match Recap) -->
+<style>
+  .bs-header { display: flex; justify-content: space-between; align-items: center; padding: 30px; background: linear-gradient(135deg, var(--surface) 0%, #0f1115 100%); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 25px; text-align: center; }
+  .bs-team { flex: 1; font-size: 2.5rem; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 4px 6px rgba(0,0,0,0.5);}
+  .bs-score-container { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 0 40px; }
+  .bs-score { font-size: 5rem; font-weight: 900; color: white; font-variant-numeric: tabular-nums; line-height: 1; text-shadow: 0 4px 25px rgba(255,159,0,0.3); }
+
+  .bs-badge { display: inline-block; padding: 6px 14px; background: var(--surface-hover); border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); font-size: 0.85rem; font-weight: 900; letter-spacing: 2px; }
+
+  .bs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+  @media(max-width: 992px) { .bs-grid { grid-template-columns: 1fr; } }
+
+  .bs-card { background: var(--surface); padding: 30px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 8px 25px rgba(0,0,0,0.15); margin-bottom: 25px; }
+  .bs-card-title { color: white; margin-top: 0; margin-bottom: 25px; font-size: 1.2rem; border-bottom: 2px solid var(--border); padding-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 900;}
+
+  .bs-stat-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+  .bs-stat-val { font-size: 1.6rem; font-weight: 900; color: white; width: 60px; text-align: center; }
+  .bs-bar-bg { flex: 1; height: 10px; background: var(--bg); border-radius: 5px; margin: 0 20px; display: flex; overflow: hidden; border: 1px solid var(--border); }
+  .bs-bar-fill-home { background: #3b82f6; transition: width 0.8s ease-out; }
+  .bs-bar-fill-away { background: #ef4444; transition: width 0.8s ease-out; }
+
+  .bs-event { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; gap: 15px; align-items: center; background: var(--bg); margin-bottom: 10px; border-radius: 8px; transition: transform 0.2s; }
+  .bs-event:hover { transform: translateX(4px); background: var(--surface-hover); }
+  .bs-event:last-child { margin-bottom: 0; }
+  .bs-event-time { font-weight: 900; color: var(--text-muted); width: 60px; font-size: 1rem; }
+  .bs-event-desc { color: white; font-size: 1rem; }
+</style>
+
+<button class="btn" style="background:var(--surface-hover); color:white; border:1px solid var(--border); margin-bottom:20px; display:inline-flex; align-items:center; gap:8px;" onclick="document.querySelector('.nav-item[onclick*=\'Wedstrijden\']').click()">
+   <span class="material-symbols-outlined">arrow_back</span> Terug naar Kalender
+</button>
+
+<div id="boxscore-loader" style="display:flex; justify-content:center; align-items:center; height:300px;">
+  <p style="color:var(--text-muted); font-size:1.2rem; font-weight:bold;">Match Recap genereren... ⏳</p>
+</div>
+
+<div id="boxscore-content" style="display:none;">
+
+   <div class="bs-header">
+     <div class="bs-team" id="bs-team-thuis" style="color: #3b82f6;">THUIS</div>
+     <div class="bs-score-container">
+        <div class="bs-badge">FINAL</div>
+        <div class="bs-score"><span id="bs-score-thuis">0</span> <span style="opacity: 0.2; margin: 0 10px;">-</span> <span id="bs-score-uit">0</span></div>
+     </div>
+     <div class="bs-team" id="bs-team-uit" style="color: #ef4444;">UIT</div>
+   </div>
+
+   <div class="bs-grid">
+     <!-- Linker kolom: Stats & Officials -->
+     <div>
+         <div class="bs-card">
+           <h3 class="bs-card-title"><span class="material-symbols-outlined" style="vertical-align:text-bottom; margin-right:8px; color:var(--accent);">query_stats</span>Team Vergelijking</h3>
+
+           <div class="bs-stat-row">
+             <div class="bs-stat-val" style="color:#3b82f6;" id="bs-shots-h">0</div>
+             <div class="bs-bar-bg"><div id="bs-bar-shots-h" class="bs-bar-fill-home" style="width:50%;"></div><div id="bs-bar-shots-a" class="bs-bar-fill-away" style="width:50%;"></div></div>
+             <div class="bs-stat-val" style="color:#ef4444;" id="bs-shots-a">0</div>
+           </div>
+           <div style="text-align:center; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; margin-top:-10px; margin-bottom:30px; font-weight:bold; letter-spacing: 2px;">Shots on Goal</div>
+
+           <div class="bs-stat-row">
+             <div class="bs-stat-val" style="color:#3b82f6;" id="bs-saves-h">0</div>
+             <div class="bs-bar-bg"><div id="bs-bar-saves-h" class="bs-bar-fill-home" style="width:50%;"></div><div id="bs-bar-saves-a" class="bs-bar-fill-away" style="width:50%;"></div></div>
+             <div class="bs-stat-val" style="color:#ef4444;" id="bs-saves-a">0</div>
+           </div>
+           <div style="text-align:center; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; margin-top:-10px; margin-bottom:30px; font-weight:bold; letter-spacing: 2px;">Saves (Reddingen)</div>
+
+           <div class="bs-stat-row">
+             <div class="bs-stat-val" style="color:#3b82f6;" id="bs-fo-h">0</div>
+             <div class="bs-bar-bg"><div id="bs-bar-fo-h" class="bs-bar-fill-home" style="width:50%;"></div><div id="bs-bar-fo-a" class="bs-bar-fill-away" style="width:50%;"></div></div>
+             <div class="bs-stat-val" style="color:#ef4444;" id="bs-fo-a">0</div>
+           </div>
+           <div style="text-align:center; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; margin-top:-10px; margin-bottom:30px; font-weight:bold; letter-spacing: 2px;">Faceoffs Gewonnen</div>
+
+           <div class="bs-stat-row">
+             <div class="bs-stat-val" style="color:#3b82f6;" id="bs-pim-h">0</div>
+             <div class="bs-bar-bg"><div id="bs-bar-pim-h" class="bs-bar-fill-home" style="width:50%;"></div><div id="bs-bar-pim-a" class="bs-bar-fill-away" style="width:50%;"></div></div>
+             <div class="bs-stat-val" style="color:#ef4444;" id="bs-pim-a">0</div>
+           </div>
+           <div style="text-align:center; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; margin-top:-10px; font-weight:bold; letter-spacing: 2px;">Penalty Minutes</div>
+
+           <div style="display:flex; justify-content:space-between; margin-top:35px; border-top:2px solid var(--border); padding-top:20px;">
+              <div style="text-align:center; flex:1;">
+                 <div style="font-size:1.8rem; font-weight:900; color:white;" id="bs-svp-h">-</div>
+                 <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:bold; letter-spacing: 1px;">Save % Thuis</div>
+              </div>
+              <div style="width:2px; background:var(--border);"></div>
+              <div style="text-align:center; flex:1;">
+                 <div style="font-size:1.8rem; font-weight:900; color:white;" id="bs-svp-a">-</div>
+                 <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:bold; letter-spacing: 1px;">Save % Uit</div>
+              </div>
+           </div>
+         </div>
+
+         <div class="bs-card">
+           <h3 class="bs-card-title"><span class="material-symbols-outlined" style="vertical-align:text-bottom; margin-right:8px; color:var(--accent);">verified_user</span>Officiële Sign-off</h3>
+           <div style="display:flex; gap:15px; align-items:center; margin-bottom:15px; background: var(--bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+              <span class="material-symbols-outlined" style="color:var(--text-muted); font-size: 2rem;">edit_document</span>
+              <div>
+                 <div style="font-size:0.8rem; color:var(--text-muted); font-weight:bold; text-transform:uppercase; letter-spacing: 1px;">Official Scorer</div>
+                 <div style="color:white; font-weight:900; font-size:1.2rem;" id="bs-ref-scorer"></div>
+              </div>
+           </div>
+           <div style="display:flex; gap:15px; align-items:center; background: var(--bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+              <span class="material-symbols-outlined" style="color:var(--text-muted); font-size: 2rem;">sports</span>
+              <div>
+                 <div style="font-size:0.8rem; color:var(--text-muted); font-weight:bold; text-transform:uppercase; letter-spacing: 1px;">Hoofdscheidsrechter</div>
+                 <div style="color:white; font-weight:900; font-size:1.2rem;" id="bs-ref-hoofd"></div>
+              </div>
+           </div>
+         </div>
+     </div>
+
+     <!-- Rechter kolom: Feed -->
+     <div>
+         <div class="bs-card" style="height: 100%; display: flex; flex-direction: column;">
+           <h3 class="bs-card-title"><span class="material-symbols-outlined" style="vertical-align:text-bottom; margin-right:8px; color:var(--accent);">history</span>Play-by-Play Logboek</h3>
+           <div id="bs-events" style="flex: 1; max-height: 800px; overflow-y: auto; padding-right: 15px;"></div>
+         </div>
+     </div>
+   </div>
+</div>

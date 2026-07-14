@@ -1,0 +1,118 @@
+// ==========================================
+// 🔴 MOD_LIVE.GS - Live Tracker Module
+// ==========================================
+
+var Mod_Live = {
+
+  checkCanScorekeep: function() {
+    if (typeof Mod_Users !== 'undefined' && Mod_Users.getUserRole) {
+       const rol = Mod_Users.getUserRole();
+       if(rol !== 'Beheerder' && rol !== 'Admin' && rol !== 'League manager' && rol !== 'Scorekeeper') {
+          return false;
+       }
+       return true;
+    }
+    return false; // Fallback
+  },
+
+  voegGeavanceerdEventToe: function(payload) {
+    if(!this.checkCanScorekeep()) return "❌ Fout: Geen rechten.";
+    const db = getDatabase();
+    const sheet = db.getSheetByName(CONFIG.TABS.EVENTS);
+    sheet.appendRow([Utilities.getUuid(), payload.wedstrijdId, payload.minuut, payload.type, payload.data, 'Advanced']);
+    return "✅ Event opgeslagen in sheet!";
+  },
+
+  finalizeWedstrijd: function(payload) {
+    if(!this.checkCanScorekeep()) return "❌ Fout: Geen rechten.";
+    const db = getDatabase();
+    const vSheet = db.getSheetByName(CONFIG.TABS.VERSLAGEN);
+    vSheet.appendRow([Utilities.getUuid(), payload.wedstrijdId, payload.uitslag, JSON.stringify(payload.stats), JSON.stringify(payload.settings), JSON.stringify(payload.signoff)]);
+
+    const wSheet = db.getSheetByName(CONFIG.TABS.WEDSTRIJDEN);
+    const wData = wSheet.getDataRange().getValues();
+    let thuisId = null;
+    let uitId = null;
+    for(let i = 1; i < wData.length; i++) {
+      if(wData[i][0] === payload.wedstrijdId) {
+        thuisId = wData[i][4];
+        uitId = wData[i][5];
+        wSheet.getRange(i + 1, 7).setValue('Gespeeld');
+        wSheet.getRange(i + 1, 8).setValue(payload.uitslag);
+        break;
+      }
+    }
+
+    // Haal events op voor achievement evaluatie
+    const eSheet = db.getSheetByName(CONFIG.TABS.EVENTS);
+    let events = [];
+    if (eSheet) {
+      const eData = eSheet.getDataRange().getValues();
+      for (let i = 1; i < eData.length; i++) {
+        if (eData[i][1] === payload.wedstrijdId) {
+           try {
+             events.push({
+               minuut: eData[i][2],
+               type: eData[i][3],
+               payload: JSON.parse(eData[i][4])
+             });
+           } catch(e) {}
+        }
+      }
+    }
+
+    // Evalueer achievements
+    if (typeof Mod_Achievements !== 'undefined' && Mod_Achievements.evalueerWedstrijd) {
+        Mod_Achievements.evalueerWedstrijd(payload.wedstrijdId, payload.stats, events, thuisId, uitId);
+    }
+
+    return "✅ Wedstrijd afgerond en verslag opgeslagen!";
+  },
+
+  // HIER DE NIEUWE TOEVOEGING: Real-time data berekenen
+  haalLiveMatchData: function(wedstrijdId) {
+    const db = getDatabase();
+    const eSheet = db.getSheetByName(CONFIG.TABS.EVENTS);
+    let events = [];
+    let stats = {
+      HOME: { score: 0, shots: 0, saves: 0, faceoffs: 0, penalties: 0 },
+      AWAY: { score: 0, shots: 0, saves: 0, faceoffs: 0, penalties: 0 }
+    };
+
+    if (eSheet) {
+      const eData = eSheet.getDataRange().getValues();
+      for (let i = 1; i < eData.length; i++) {
+        if (eData[i][1] === wedstrijdId) {
+          let type = eData[i][3];
+          let payload = {};
+          try { payload = JSON.parse(eData[i][4]); } catch(e) {}
+
+          events.push({ minuut: eData[i][2], type: type, payload: payload });
+
+          let teamKey = payload.team;
+          if (teamKey === 'HOME' || teamKey === 'AWAY') {
+            let oppKey = teamKey === 'HOME' ? 'AWAY' : 'HOME';
+            if (type === 'GOAL') { stats[teamKey].score++; stats[teamKey].shots++; }
+            if (type === 'SHOT') { stats[teamKey].shots++; stats[oppKey].saves++; }
+            if (type === 'PENALTY') { stats[teamKey].penalties++; }
+            if (type === 'FACEOFF_WON') { stats[teamKey].faceoffs++; }
+          }
+        }
+      }
+    }
+
+    let status = 'Live';
+    const wSheet = db.getSheetByName(CONFIG.TABS.WEDSTRIJDEN);
+    if(wSheet) {
+       const wData = wSheet.getDataRange().getValues();
+       for(let i=1; i<wData.length; i++) {
+          if(wData[i][0] === wedstrijdId) {
+             if(wData[i][6] === 'Gespeeld') status = 'Afgelopen';
+             break;
+          }
+       }
+    }
+
+    return { stats: stats, events: events.reverse(), status: status };
+  }
+};

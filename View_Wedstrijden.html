@@ -1,0 +1,71 @@
+<!-- VIEW: GAMEDAY SCHEMA (Wedstrijdkalender) -->
+
+<style>
+  /* Gameday Card Styling */
+  .match-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 25px; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); transition: transform 0.2s, border-color 0.2s; }
+  .match-card:hover { transform: translateY(-3px); border-color: rgba(255,159,0,0.4); box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
+
+  .match-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px; }
+  .match-card-body { display: flex; justify-content: space-between; align-items: center; }
+
+  .match-team { flex: 1; font-size: 1.6rem; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  .text-right { text-align: right; }
+  .text-left { text-align: left; }
+  .match-center { width: 160px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
+
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; }
+  @media(max-width: 600px) {
+     .cards-grid { grid-template-columns: 1fr; }
+     .match-team { font-size: 1.2rem; }
+     .match-center { width: 100px; }
+  }
+
+  /* Admin Widget Styling */
+  .admin-widget { background: linear-gradient(135deg, var(--surface) 0%, rgba(59,130,246,0.1) 100%); border: 1px solid #3b82f6; border-radius: 16px; padding: 25px; margin-bottom: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+</style>
+
+<!-- ADMIN ONLY: Wedstrijd Inplannen (Standaard verborgen via display:none) -->
+<div id="admin-match-form" class="admin-widget" style="display:none;">
+  <h3 style="margin-top:0; color:white; border-bottom: 2px solid #3b82f6; padding-bottom: 12px; font-size: 1.2rem; display:flex; align-items:center; gap:8px;">
+     <span class="material-symbols-outlined" style="color:#3b82f6;">edit_calendar</span> Wedstrijd Inplannen (Admin)
+  </h3>
+
+  <div class="form-group" style="margin-bottom: 20px;">
+    <label>Koppel aan Competitie</label>
+    <select id="wedstrijdCompetitie" onchange="filterTeamsVoorWedstrijd()" style="font-size:1.1rem; padding:12px;"><option value="">Laden...</option></select>
+  </div>
+
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Speeldatum</label>
+      <input type="date" id="wedstrijdDatum">
+    </div>
+    <div class="form-group">
+      <label>Starttijd</label>
+      <input type="time" id="wedstrijdTijd">
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Thuis Team</label>
+      <select id="wedstrijdThuis"><option value="">Selecteer eerst een competitie</option></select>
+    </div>
+    <div class="form-group">
+      <label>Uit Team</label>
+      <select id="wedstrijdUit"><option value="">Selecteer eerst een competitie</option></select>
+    </div>
+  </div>
+
+  <button class="btn" style="background:#3b82f6; color:white; width:100%; box-shadow:0 4px 15px rgba(59,130,246,0.3);" onclick="slaWedstrijdOp()" id="btnOpslaanWedstrijd">Wedstrijd Inplannen</button>
+  <div id="wedstrijdMelding" style="margin-top: 15px; font-weight: bold; text-align:center;"></div>
+</div>
+
+<!-- DE GAMEDAY KALENDER (Zichtbaar voor iedereen) -->
+<h3 style="color:white; margin-bottom:20px; font-size:1.5rem; display:flex; align-items:center; gap:10px;">
+   <span class="material-symbols-outlined" style="color:var(--accent); font-size:2rem;">event_available</span> Officiële Kalender
+</h3>
+
+<div id="wedstrijd-cards-container" class="cards-grid">
+  <!-- De JavaScript vult hier de Gameday Cards in -->
+</div>

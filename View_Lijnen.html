@@ -1,0 +1,82 @@
+<style>
+  .lines-wrapper { display: flex; flex-direction: column; gap: 20px; }
+  @media(min-width: 992px) { .lines-wrapper { flex-direction: row; } }
+  .lines-sidebar { flex: 0 0 320px; display: flex; flex-direction: column; gap: 20px; }
+  .lines-main { flex: 1; }
+
+  .roster-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+  .roster-list { display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding-right: 5px; }
+
+  .player-chip { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: 0.2s; }
+  .player-chip:hover { border-color: var(--accent); background: var(--surface-hover); }
+  .player-chip.inactive { opacity: 0.4; border-style: dashed; }
+
+  .lines-toolbar { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; background: var(--surface); padding: 15px 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
+
+  .line-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; border-left: 4px solid var(--accent); }
+  .line-title { color: white; margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid var(--border); padding-bottom: 10px; text-transform: uppercase; font-size: 1rem; font-weight: 800; letter-spacing: 0.5px;}
+
+  .pos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
+  .pos-item label { display: block; font-size: 0.75rem; font-weight: bold; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase;}
+  .pos-item select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: white; font-size: 0.9rem; }
+
+  .roster-list::-webkit-scrollbar { width: 6px; }
+  .roster-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+</style>
+
+<div class="form-container" style="margin-bottom: 20px;">
+  <h3 style="margin-top:0; display:flex; align-items:center; gap:10px;"><span class="material-symbols-outlined">strategy</span> Line-up Builder</h3>
+  <select id="lineTeamSelect" onchange="laadTeamLijnen()" style="width:100%; padding:12px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:white; font-size:1rem; font-weight:bold;">
+    <option value="">Laden...</option>
+  </select>
+</div>
+
+<div id="lines-editor" class="lines-wrapper" style="display:none;">
+
+  <!-- LINKER KOLOM: ROSTER MANAGEMENT -->
+  <div class="lines-sidebar">
+    <div class="roster-card">
+      <h4 style="color:white; margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px; display:flex; justify-content:space-between;">
+        <span>🟢 Active Roster</span> <span id="lines-active-count" style="color:var(--text-muted); font-size:0.9rem;">0</span>
+      </h4>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0;">Klik op een speler om hem te scratchen.</p>
+      <div id="lines-active-list" class="roster-list"></div>
+    </div>
+
+    <div class="roster-card">
+      <h4 style="color:white; margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px;">🔴 Inactive / Scratch</h4>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0;">Gekwetst of afwezig? Klik om te activeren.</p>
+      <div id="lines-inactive-list" class="roster-list"></div>
+    </div>
+
+    <div class="roster-card">
+      <h4 style="color:white; margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px;">🤝 Leenspeler Toevoegen</h4>
+      <select id="lines-loan-select" style="width:100%; margin-bottom:10px;"><option value="">Laden...</option></select>
+      <button class="btn" style="width:100%; font-size:0.8rem; background: #3b82f6; color: white;" onclick="addLoanPlayerLijnen()">Voeg toe aan Roster</button>
+    </div>
+  </div>
+
+  <!-- RECHTER KOLOM: BUILDER -->
+  <div class="lines-main">
+
+    <div class="lines-toolbar">
+       <div style="flex:1;">
+         <label style="color:var(--text-muted); font-size:0.8rem; font-weight:bold; margin-right:10px;">AANTAL LIJNEN</label>
+         <select id="lines-num-select" onchange="veranderAantalLijnen(this.value)" style="width:120px; padding:8px; background:var(--bg); color:white; border:1px solid var(--border); border-radius:4px;">
+            <option value="1">1 Lijn</option>
+            <option value="2">2 Lijnen</option>
+            <option value="3" selected>3 Lijnen</option>
+            <option value="4">4 Lijnen</option>
+         </select>
+       </div>
+       <button class="btn" style="background:var(--surface-hover); color:var(--text); border:1px solid var(--border);" onclick="autoFillLijnen()"><span class="material-symbols-outlined" style="vertical-align:middle; font-size:18px;">magic_button</span> Auto-Fill</button>
+       <button class="btn" id="btnOpslaanLijnen" onclick="slaLijnenOp()"><span class="material-symbols-outlined" style="vertical-align:middle; font-size:18px;">save</span> Opslaan</button>
+    </div>
+    <div id="lijnenMelding" style="margin-bottom:15px; font-weight:bold; text-align:right;"></div>
+
+    <div id="lines-container">
+       <!-- Dynamisch gevuld door JS -->
+    </div>
+
+  </div>
+</div>

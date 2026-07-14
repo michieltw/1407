@@ -1,0 +1,35 @@
+<!-- VIEW: MIJN STICKS -->
+<style>
+  .sticks-container { background: var(--surface); padding: 30px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 15px 40px rgba(0,0,0,0.3); margin-bottom: 30px; }
+  .sticks-banner { width: 100%; height: 200px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border); margin-bottom: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+  .sticks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; }
+  @media(max-width: 768px) { .sticks-grid { grid-template-columns: 1fr; } }
+  .stick-placeholder { background: var(--bg); border: 2px dashed var(--border); border-radius: 12px; height: 350px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); padding: 20px; text-align: center; position: relative; overflow: hidden; transition: border-color 0.2s; }
+  .stick-placeholder:hover { border-color: var(--accent); }
+  .stick-placeholder .material-symbols-outlined { font-size: 3rem; margin-bottom: 10px; color: var(--border); transition: color 0.2s; }
+  .stick-placeholder:hover .material-symbols-outlined { color: var(--accent); }
+  .stick-title { color: white; font-weight: 900; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+</style>
+
+<div class="sticks-container">
+  <img src="https://images.unsplash.com/photo-1580748141549-71748dbe0bdc?auto=format&fit=crop&w=1200&q=80" alt="Hockey Sticks Banner" class="sticks-banner">
+
+  <h2 style="color: white; font-size: 2.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px 0;">Mijn Arsenaal</h2>
+  <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.6; margin-bottom: 20px;">
+    Een speler is niets zonder zijn gereedschap. Beheer hier de sticks die je gebruikt tijdens wedstrijden en trainingen. Voeg afbeeldingen toe van je primary en backup stick om je profiel compleet te maken.
+  </p>
+
+  <div class="sticks-grid">
+    <div class="stick-placeholder">
+      <span class="material-symbols-outlined">sports_hockey</span>
+      <div class="stick-title">Primary Stick</div>
+      <p style="font-size: 0.85rem; margin:0;">Upload binnenkort een foto van je go-to stick.</p>
+    </div>
+
+    <div class="stick-placeholder">
+      <span class="material-symbols-outlined">sports_hockey</span>
+      <div class="stick-title">Backup Stick</div>
+      <p style="font-size: 0.85rem; margin:0;">Upload binnenkort een foto van je reserve stick.</p>
+    </div>
+  </div>
+</div>

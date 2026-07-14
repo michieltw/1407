@@ -1,0 +1,43 @@
+<!-- VIEW: STANDEN & STATISTIEKEN -->
+<style>
+  .form-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 30px; border-top: 4px solid var(--accent); }
+  .form-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; font-size: 1rem;}
+  .app-table th { text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+  .col-center { text-align: center !important; }
+  .stand-row:hover { background-color: #f8fafc; }
+  .rank-badge { display: inline-block; width: 24px; height: 24px; line-height: 24px; text-align: center; border-radius: 50%; background: #e2e8f0; color: #475569; font-weight: bold; font-size: 0.8rem; margin-right: 10px; }
+  .rank-1 { background: #fbbf24; color: #fff; } /* Goud */
+  .rank-2 { background: #94a3b8; color: #fff; } /* Zilver */
+  .rank-3 { background: #b45309; color: #fff; } /* Brons */
+  .color-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
+</style>
+
+<div class="form-container">
+  <h3 style="margin-top:0;">🏆 Selecteer Competitie</h3>
+  <div class="form-group">
+    <select id="standenCompetitieSelect" onchange="haalSpecifiekeStandOp()">
+      <option value="">Laden...</option>
+    </select>
+  </div>
+</div>
+
+<div id="standenTabelContainer" style="display:none; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow: hidden;">
+  <table class="app-table" style="margin-top:0;">
+    <thead>
+      <tr>
+        <th>Team</th>
+        <th class="col-center" title="Gespeeld">GP</th>
+        <th class="col-center" title="Winst">W</th>
+        <th class="col-center" title="Gelijk">T</th>
+        <th class="col-center" title="Verlies">L</th>
+        <th class="col-center" title="Goals Voor">GF</th>
+        <th class="col-center" title="Goals Tegen">GA</th>
+        <th class="col-center" title="Doelsaldo">GD</th>
+        <th class="col-center" title="Punten" style="font-size:0.9rem; color:#0f172a;">PTS</th>
+      </tr>
+    </thead>
+    <tbody id="standenTableBody">
+      <!-- Wordt gevuld door Javascript -->
+    </tbody>
+  </table>
+</div>

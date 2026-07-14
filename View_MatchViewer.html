@@ -1,0 +1,69 @@
+
+<style>
+  .mv-header { display: flex; justify-content: space-between; align-items: center; padding: 30px; background: linear-gradient(135deg, var(--surface) 0%, #0f1115 100%); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 20px; text-align: center; }
+  .mv-team { flex: 1; font-size: 2rem; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);}
+  .mv-score-container { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 0 30px; }
+  .mv-score { font-size: 4.5rem; font-weight: 900; color: white; font-variant-numeric: tabular-nums; line-height: 1; text-shadow: 0 4px 20px rgba(255,159,0,0.4); }
+
+  .mv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media(max-width: 768px) { .mv-grid { grid-template-columns: 1fr; } }
+
+  .mv-card { background: var(--surface); padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+  .mv-card-title { color: white; margin-top: 0; margin-bottom: 20px; font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800;}
+
+  .mv-stat-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+  .mv-stat-val { font-size: 1.3rem; font-weight: 900; color: white; width: 50px; text-align: center; }
+  .mv-bar-bg { flex: 1; height: 8px; background: var(--border); border-radius: 4px; margin: 0 15px; display: flex; overflow: hidden; }
+  .mv-bar-fill-home { background: #3b82f6; transition: width 0.5s ease; }
+  .mv-bar-fill-away { background: #ef4444; transition: width 0.5s ease; }
+
+  .mv-event { padding: 12px 15px; border-bottom: 1px solid var(--border); display: flex; gap: 15px; align-items: center; background: var(--bg); margin-bottom: 8px; border-radius: 6px;}
+  .mv-event:last-child { margin-bottom: 0; }
+  .mv-event-time { font-weight: 900; color: var(--text-muted); width: 55px; font-size: 0.9rem; }
+  .mv-event-desc { color: white; font-size: 0.95rem; }
+</style>
+
+<button class="btn" style="background:var(--surface-hover); color:white; border:1px solid var(--border); margin-bottom:20px; display:inline-flex; align-items:center; gap:5px;" onclick="document.querySelector('.nav-item.active').click()"><span class="material-symbols-outlined">arrow_back</span> Terug</button>
+
+<div class="mv-header">
+   <div class="mv-team" id="lm-thuis-naam" style="color: #3b82f6;">THUIS</div>
+   <div class="mv-score-container">
+      <div id="lm-status-badge" class="live-indicator"><div class="live-dot"></div> LIVE</div>
+      <div class="mv-score"><span id="lm-score-thuis">0</span> <span style="opacity: 0.3; margin: 0 10px;">-</span> <span id="lm-score-uit">0</span></div>
+   </div>
+   <div class="mv-team" id="lm-uit-naam" style="color: #ef4444;">UIT</div>
+</div>
+
+<div class="mv-grid">
+   <div class="mv-card">
+      <h3 class="mv-card-title">Team Statistieken</h3>
+
+      <div class="mv-stat-row">
+         <div class="mv-stat-val" style="color:#3b82f6;" id="lm-shots-thuis">0</div>
+         <div class="mv-bar-bg"><div id="lm-bar-shots-thuis" class="mv-bar-fill-home" style="width:50%;"></div><div id="lm-bar-shots-uit" class="mv-bar-fill-away" style="width:50%;"></div></div>
+         <div class="mv-stat-val" style="color:#ef4444;" id="lm-shots-uit">0</div>
+      </div>
+      <div style="text-align:center; font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; margin-top:-10px; margin-bottom:25px; font-weight:bold; letter-spacing: 1px;">Shots on Goal</div>
+
+      <div class="mv-stat-row">
+         <div class="mv-stat-val" style="color:#3b82f6;" id="lm-fo-thuis">0</div>
+         <div class="mv-bar-bg"><div id="lm-bar-fo-thuis" class="mv-bar-fill-home" style="width:50%;"></div><div id="lm-bar-fo-uit" class="mv-bar-fill-away" style="width:50%;"></div></div>
+         <div class="mv-stat-val" style="color:#ef4444;" id="lm-fo-uit">0</div>
+      </div>
+      <div style="text-align:center; font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; margin-top:-10px; margin-bottom:25px; font-weight:bold; letter-spacing: 1px;">Faceoffs Won</div>
+
+      <div class="mv-stat-row">
+         <div class="mv-stat-val" style="color:#3b82f6;" id="lm-pen-thuis">0</div>
+         <div class="mv-bar-bg"><div id="lm-bar-pen-thuis" class="mv-bar-fill-home" style="width:50%;"></div><div id="lm-bar-pen-uit" class="mv-bar-fill-away" style="width:50%;"></div></div>
+         <div class="mv-stat-val" style="color:#ef4444;" id="lm-pen-uit">0</div>
+      </div>
+      <div style="text-align:center; font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; margin-top:-10px; font-weight:bold; letter-spacing: 1px;">Penalty Minutes</div>
+   </div>
+
+   <div class="mv-card">
+      <h3 class="mv-card-title">Play-by-Play Feed</h3>
+      <div id="lm-events" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+         <p style="color:var(--text-muted); font-style:italic;">Events ophalen... ⏳</p>
+      </div>
+   </div>
+</div>
