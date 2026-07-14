@@ -20,6 +20,66 @@ var Mod_Users = {
     return getDatabase().getSheetByName(CONFIG.TABS.USERS).getDataRange().getDisplayValues();
   },
 
+
+  haalMijnProfielData: function() {
+    try {
+      const db = getDatabase();
+      const userEmail = Session.getActiveUser().getEmail();
+      if (!userEmail) return null;
+
+      const uSheet = db.getSheetByName(CONFIG.TABS.USERS);
+      const uData = uSheet.getDataRange().getValues();
+      let myUser = null;
+
+      for(let i = 1; i < uData.length; i++) {
+        if(uData[i][2] === userEmail) {
+          myUser = {
+            id: uData[i][0], naam: uData[i][1], lengte: uData[i][6], gewicht: uData[i][7],
+            voorkeursnummer: uData[i][10], stickMerk: uData[i][11], stickModel: uData[i][12],
+            stickBlad: uData[i][13], stickFlex: uData[i][14], fotoUrl: uData[i][15], bio: uData[i][16] || ''
+          };
+          break;
+        }
+      }
+      return myUser;
+    } catch(e) {
+      return null;
+    }
+  },
+
+  updateMijnProfiel: function(data) {
+    try {
+      const db = getDatabase();
+      const userEmail = Session.getActiveUser().getEmail();
+      if (!userEmail) return "❌ Fout: Niet ingelogd.";
+
+      const uSheet = db.getSheetByName(CONFIG.TABS.USERS);
+      const uData = uSheet.getDataRange().getValues();
+
+      for(let i = 1; i < uData.length; i++) {
+        if(uData[i][2] === userEmail) {
+          // Columns: 0:ID, 1:Naam, 2:Email, 3:Rol, 4:Aangemaakt, 5:GebDatum, 6:Lengte, 7:Gewicht, 8:Hand, 9:Niveau
+          // 10:Nummer, 11:Merk, 12:Model, 13:Blad, 14:Flex, 15:Foto, 16:Bio
+
+          if(data.lengte) uSheet.getRange(i+1, 7).setValue(data.lengte);
+          if(data.gewicht) uSheet.getRange(i+1, 8).setValue(data.gewicht);
+          if(data.voorkeursnummer) uSheet.getRange(i+1, 11).setValue(data.voorkeursnummer);
+          if(data.stickMerk) uSheet.getRange(i+1, 12).setValue(data.stickMerk);
+          if(data.stickModel) uSheet.getRange(i+1, 13).setValue(data.stickModel);
+          if(data.stickBlad) uSheet.getRange(i+1, 14).setValue(data.stickBlad);
+          if(data.stickFlex) uSheet.getRange(i+1, 15).setValue(data.stickFlex);
+          if(data.fotoUrl !== undefined) uSheet.getRange(i+1, 16).setValue(data.fotoUrl);
+          if(data.bio !== undefined) uSheet.getRange(i+1, 17).setValue(data.bio);
+
+          return "✅ Profiel succesvol geüpdatet!";
+        }
+      }
+      return "❌ Fout: Gebruiker niet gevonden.";
+    } catch(e) {
+      return "❌ Fout: " + e.toString();
+    }
+  },
+
   checkMijnTeamStatus: function() {
     try {
       const db = getDatabase();

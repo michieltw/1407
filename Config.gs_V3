@@ -31,9 +31,7 @@ function setupTeamsDatabase() {
     sheet.getRange("A1:G1").setFontWeight("bold").setBackground("#e2e8f0");
   }
 }
-// (Laat de andere setup-functies staan als je ze nog hebt, dit is de belangrijkste wijziging)
 
-function getDatabase() { return SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID); }
 
 function setupDatabase() {
   const db = getDatabase();
@@ -110,7 +108,7 @@ function upgradeUsersDatabase() {
     const headers = [
       "User_ID", "Naam", "Email", "Rol", "Aangemaakt",
       "Geboortedatum", "Lengte_cm", "Gewicht_kg", "Schiet_Hand", "Niveau",
-      "Voorkeursnummer", "Stick_Merk", "Stick_Model", "Stick_Blad", "Stick_Flex", "Foto_URL"
+      "Voorkeursnummer", "Stick_Merk", "Stick_Model", "Stick_Blad", "Stick_Flex", "Foto_URL", "Bio"
     ];
     // Overschrijf rij 1 met de nieuwe uitgebreide headers
     sheet.getRange(1, 1, 1, headers.length).setValues([headers]);

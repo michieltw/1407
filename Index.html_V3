@@ -117,6 +117,66 @@
     </div>
 
     <script>
+
+      function initSticksScherm() {
+         // Kan in de toekomst worden uitgebreid om opgeslagen foto's op te halen
+      }
+
+      function initProfielScherm() {
+        google.script.run.withSuccessHandler(function(res) {
+          if(res) {
+             document.getElementById('mijnProfielNaam').innerText = res.naam || 'Onbekend';
+             document.getElementById('mijnProfielTeam').innerText = 'Profielgegevens geladen';
+
+             let fotoUrl = (res.fotoUrl && res.fotoUrl.includes('http'))
+               ? res.fotoUrl
+               : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(res.naam || 'Player') + '&background=1f1f1f&color=FF9F00&bold=true&size=200';
+
+             document.getElementById('mijnProfielFoto').src = fotoUrl;
+
+             if(document.getElementById('mpLengte')) document.getElementById('mpLengte').value = res.lengte || '';
+             if(document.getElementById('mpGewicht')) document.getElementById('mpGewicht').value = res.gewicht || '';
+             if(document.getElementById('mpNummer')) document.getElementById('mpNummer').value = res.voorkeursnummer || '';
+             if(document.getElementById('mpStickMerk')) document.getElementById('mpStickMerk').value = res.stickMerk || '';
+             if(document.getElementById('mpStickModel')) document.getElementById('mpStickModel').value = res.stickModel || '';
+             if(document.getElementById('mpStickBlad')) document.getElementById('mpStickBlad').value = res.stickBlad || '';
+             if(document.getElementById('mpStickFlex')) document.getElementById('mpStickFlex').value = res.stickFlex || '';
+             if(document.getElementById('mpFotoUrl')) document.getElementById('mpFotoUrl').value = res.fotoUrl || '';
+             if(document.getElementById('mpBio')) document.getElementById('mpBio').value = res.bio || '';
+          }
+        }).doAction('Users', 'haalMijnProfielData', null);
+      }
+
+      function slaMijnProfielOp() {
+        const btn = document.getElementById('btnOpslaanMijnProfiel');
+        const melding = document.getElementById('mpMelding');
+
+        const data = {
+          lengte: document.getElementById('mpLengte').value,
+          gewicht: document.getElementById('mpGewicht').value,
+          voorkeursnummer: document.getElementById('mpNummer').value,
+          stickMerk: document.getElementById('mpStickMerk').value,
+          stickModel: document.getElementById('mpStickModel').value,
+          stickBlad: document.getElementById('mpStickBlad').value,
+          stickFlex: document.getElementById('mpStickFlex').value,
+          fotoUrl: document.getElementById('mpFotoUrl').value,
+          bio: document.getElementById('mpBio').value
+        };
+
+        btn.disabled = true; btn.innerText = "Bezig...";
+        google.script.run.withSuccessHandler(function(res) {
+          btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined">save</span> Wijzigingen Opslaan';
+          if(res.status === 'success' && !res.data.includes('❌')) {
+            melding.style.color = "#4ade80";
+            melding.innerText = res.data;
+            setTimeout(() => melding.innerText = '', 3000);
+            initProfielScherm(); // Reload updated data
+          } else {
+            melding.style.color = "#ef4444"; melding.innerText = res.data || res.message;
+          }
+        }).doAction('Users', 'updateMijnProfiel', data);
+      }
+
       document.addEventListener('DOMContentLoaded', () => {
         if(!sessionStorage.getItem('termsAccepted')) {
           document.getElementById('startup-modal').style.display = 'flex';
@@ -150,6 +210,8 @@
       <!-- Specifieke weergaves -->
       <a class="nav-item highlight" data-role="gast" onclick="laadView('Register', this); sluitMobielMenu();">📝 Registreren</a>
       <a class="nav-item" data-role="speler" onclick="laadView('Aanvragen', this); sluitMobielMenu();">Team Joinen (Aanvraag)</a>
+      <a class="nav-item highlight" data-role="speler" onclick="laadView('Profiel', this); sluitMobielMenu();">👤 Mijn Profiel</a>
+      <a class="nav-item highlight" data-role="speler" onclick="laadView('Sticks', this); sluitMobielMenu();">🏒 Mijn Sticks</a>
 
       <div id="beheerder-menu-header" style="padding: 15px 20px 5px 20px; font-size: 0.75rem; color: #737373; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">Beheer & Live</div>
       <a class="nav-item highlight" data-role="beheerder" onclick="laadView('Live', this); sluitMobielMenu();">🔴 Live Tracker</a>
@@ -327,6 +389,8 @@
             else if (viewNaam === 'Aanvragen') { initAanvragenScherm(); }
             else if (viewNaam === 'Statistieken') { initStatistiekenScherm(); }
             else if (viewNaam === 'Lijnen') { initLijnenScherm(); }
+            else if (viewNaam === 'Profiel') { initProfielScherm(); }
+            else if (viewNaam === 'Sticks') { initSticksScherm(); }
             // Register view heeft geen init logica nodig
           })
           .withFailureHandler(function(error) {
@@ -1429,6 +1493,66 @@
             melding.style.color = "red"; melding.innerText = res.message;
           }
         }).doAction('Announcements', 'voegBerichtToe', data);
+      }
+
+
+      function initSticksScherm() {
+         // Kan in de toekomst worden uitgebreid om opgeslagen foto's op te halen
+      }
+
+      function initProfielScherm() {
+        google.script.run.withSuccessHandler(function(res) {
+          if(res) {
+             document.getElementById('mijnProfielNaam').innerText = res.naam || 'Onbekend';
+             document.getElementById('mijnProfielTeam').innerText = 'Profielgegevens geladen';
+
+             let fotoUrl = (res.fotoUrl && res.fotoUrl.includes('http'))
+               ? res.fotoUrl
+               : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(res.naam || 'Player') + '&background=1f1f1f&color=FF9F00&bold=true&size=200';
+
+             document.getElementById('mijnProfielFoto').src = fotoUrl;
+
+             if(document.getElementById('mpLengte')) document.getElementById('mpLengte').value = res.lengte || '';
+             if(document.getElementById('mpGewicht')) document.getElementById('mpGewicht').value = res.gewicht || '';
+             if(document.getElementById('mpNummer')) document.getElementById('mpNummer').value = res.voorkeursnummer || '';
+             if(document.getElementById('mpStickMerk')) document.getElementById('mpStickMerk').value = res.stickMerk || '';
+             if(document.getElementById('mpStickModel')) document.getElementById('mpStickModel').value = res.stickModel || '';
+             if(document.getElementById('mpStickBlad')) document.getElementById('mpStickBlad').value = res.stickBlad || '';
+             if(document.getElementById('mpStickFlex')) document.getElementById('mpStickFlex').value = res.stickFlex || '';
+             if(document.getElementById('mpFotoUrl')) document.getElementById('mpFotoUrl').value = res.fotoUrl || '';
+             if(document.getElementById('mpBio')) document.getElementById('mpBio').value = res.bio || '';
+          }
+        }).doAction('Users', 'haalMijnProfielData', null);
+      }
+
+      function slaMijnProfielOp() {
+        const btn = document.getElementById('btnOpslaanMijnProfiel');
+        const melding = document.getElementById('mpMelding');
+
+        const data = {
+          lengte: document.getElementById('mpLengte').value,
+          gewicht: document.getElementById('mpGewicht').value,
+          voorkeursnummer: document.getElementById('mpNummer').value,
+          stickMerk: document.getElementById('mpStickMerk').value,
+          stickModel: document.getElementById('mpStickModel').value,
+          stickBlad: document.getElementById('mpStickBlad').value,
+          stickFlex: document.getElementById('mpStickFlex').value,
+          fotoUrl: document.getElementById('mpFotoUrl').value,
+          bio: document.getElementById('mpBio').value
+        };
+
+        btn.disabled = true; btn.innerText = "Bezig...";
+        google.script.run.withSuccessHandler(function(res) {
+          btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined">save</span> Wijzigingen Opslaan';
+          if(res.status === 'success' && !res.data.includes('❌')) {
+            melding.style.color = "#4ade80";
+            melding.innerText = res.data;
+            setTimeout(() => melding.innerText = '', 3000);
+            initProfielScherm(); // Reload updated data
+          } else {
+            melding.style.color = "#ef4444"; melding.innerText = res.data || res.message;
+          }
+        }).doAction('Users', 'updateMijnProfiel', data);
       }
 
       document.addEventListener('DOMContentLoaded', () => {

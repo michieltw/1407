@@ -4,7 +4,7 @@
 
 // 1. Deze functie laadt de User Interface wanneer een gebruiker de app opent
 function doGet(e) {
-  return HtmlService.createTemplateFromFile('Index')
+  return HtmlService.createTemplateFromFile('Index.html_V3')
       .evaluate()
       .setTitle('IJshockey Manager')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1'); // Zorgt dat het goed schaalt op mobiel
@@ -50,8 +50,15 @@ function doAction(moduleName, actionName, payload) {
 // ==========================================
 function getViewHTML(viewNaam) {
   try {
+    // Lookup table voor versioned files
+    const versions = {
+       'Dashboard': 'View_Dashboard.html_V2',
+       'Profiel': 'View_Profiel.html',
+       'Sticks': 'View_Sticks.html'
+    };
+
     // We zoeken een bestand in GAS dat heet: View_Users.html of View_Dashboard.html
-    const bestandsnaam = 'View_' + viewNaam;
+    const bestandsnaam = versions[viewNaam] || ('View_' + viewNaam + '.html');
     return HtmlService.createHtmlOutputFromFile(bestandsnaam).getContent();
   } catch(error) {
     throw new Error("Het scherm '" + viewNaam + "' bestaat nog niet.");
