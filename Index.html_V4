@@ -116,9 +116,6 @@
       </div>
     </div>
 
-    <script>
-
-
       function initLeagueManager() {
          google.script.run.withSuccessHandler(res => {
             const sel = document.getElementById('lmCompSelect');
@@ -259,6 +256,8 @@
         }).doAction('Users', 'updateMijnProfiel', data);
       }
 
+    </script>
+    <script>
       document.addEventListener('DOMContentLoaded', () => {
         if(!sessionStorage.getItem('termsAccepted')) {
           document.getElementById('startup-modal').style.display = 'flex';
@@ -428,7 +427,7 @@
       </div>
     </div>
 
-<script>
+    <script>
       // ==========================================
       // HELPER: Anti-crash String Escaper
       // ==========================================
@@ -1588,8 +1587,6 @@
         }).doAction('Announcements', 'voegBerichtToe', data);
       }
 
-
-
       function initLeagueManager() {
          google.script.run.withSuccessHandler(res => {
             const sel = document.getElementById('lmCompSelect');
@@ -1730,6 +1727,8 @@
         }).doAction('Users', 'updateMijnProfiel', data);
       }
 
+    </script>
+    <script>
       document.addEventListener('DOMContentLoaded', () => {
         // App forceert bij opstarten de Gast-rol
         wisselRol('gast');
