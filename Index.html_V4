@@ -52,8 +52,20 @@
         --sidebar-hover: #1a1d24;
       }
 
-      body.app-shell { font-family: 'Hanken Grotesk', system-ui, sans-serif; margin: 0; padding: 0; background-color: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
-
+       body.app-shell { 
+  font-family: 'Hanken Grotesk', system-ui, sans-serif; 
+  margin: 0; 
+  padding: 0; 
+  /* HIER STEL JE DE ACHTERGRONDAFBELDING IN */
+  background-image: url('https://cdn.shopify.com/s/files/1/1038/7203/7203/files/hlboposterblackandwhite.png?v=1784058798');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--text); 
+  display: flex; 
+  height: 100vh; 
+  overflow: hidden; 
+}
       .sidebar { width: 260px; background-color: var(--primary-nav); color: white; display: flex; flex-direction: column; z-index: 100; transition: transform 0.3s ease; flex-shrink: 0; overflow-y: auto; overflow-x: hidden; border-right: 1px solid var(--border); }
       .logo-container { padding: 25px 20px; text-align: center; border-bottom: 1px solid var(--border); margin-bottom: 10px; background: radial-gradient(circle at top, #1a1d24 0%, transparent 100%); }
       .logo-container img { max-width: 100%; height: auto; border-radius: 8px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
