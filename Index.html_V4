@@ -118,6 +118,88 @@
 
     <script>
 
+
+      function initLeagueManager() {
+         google.script.run.withSuccessHandler(res => {
+            const sel = document.getElementById('lmCompSelect');
+            sel.innerHTML = '<option value="">-- Kies --</option>';
+            if(res.status === 'success') {
+               res.data.forEach((r,i) => { if(i>0) sel.innerHTML += `<option value="${r[0]}">${r[1]}</option>`; });
+            }
+         }).doAction('Competities', 'haalCompetitiesOp', null);
+
+         google.script.run.withSuccessHandler(res => {
+            const sel = document.getElementById('lmScorekeeperSelect');
+            sel.innerHTML = '<option value="">-- Kies User --</option>';
+            if(res.status === 'success') {
+               res.data.forEach((r,i) => { if(i>0) sel.innerHTML += `<option value="${r[0]}">${r[1]} (${r[3]})</option>`; });
+            }
+         }).doAction('Users', 'haalAlleUsersOp', null);
+
+         google.script.run.withSuccessHandler(res => {
+            const sel = document.getElementById('lmMatchSelect');
+            sel.innerHTML = '<option value="">-- Kies Wedstrijd --</option>';
+            if(res.status === 'success') {
+               res.data.forEach((r,i) => { if(i>0) sel.innerHTML += `<option value="${r[0]}" data-uit="${r[6]}" data-stat="${r[5]}">${r[1]} | ${r[3]} vs ${r[4]}</option>`; });
+            }
+         }).doAction('Wedstrijden', 'haalWedstrijdenOp', null);
+      }
+
+      function wijsScorekeeperToe() {
+         const uid = document.getElementById('lmScorekeeperSelect').value;
+         if(!uid) return alert('Kies een user');
+         google.script.run.withSuccessHandler(res => {
+            document.getElementById('lmMelding').innerText = res.data || res.message;
+            initLeagueManager();
+         }).doAction('Users', 'wijsRolToe', {userId: uid, nieuweRol: 'Scorekeeper'});
+      }
+
+      function laadWedstrijdDataVoorBewerk() {
+         const sel = document.getElementById('lmMatchSelect');
+         if(!sel.value) { document.getElementById('lmEditMatchContainer').style.display='none'; return; }
+         document.getElementById('lmEditMatchContainer').style.display='grid';
+         const opt = sel.options[sel.selectedIndex];
+         document.getElementById('lmEditUitslag').value = opt.getAttribute('data-uit');
+         document.getElementById('lmEditStatus').value = opt.getAttribute('data-stat');
+      }
+
+      function slaBewerkteWedstrijdOp() {
+         const sel = document.getElementById('lmMatchSelect');
+         if(!sel.value) return;
+         const payload = {
+            wedstrijdId: sel.value,
+            uitslag: document.getElementById('lmEditUitslag').value,
+            status: document.getElementById('lmEditStatus').value
+         };
+         google.script.run.withSuccessHandler(res => {
+            document.getElementById('lmMelding').innerText = res.data || res.message;
+         }).doAction('Wedstrijden', 'wijzigWedstrijd', payload);
+      }
+
+      function initTeamManager() {
+         google.script.run.withSuccessHandler(res => {
+            const sel = document.getElementById('tmSelectTeam');
+            sel.innerHTML = '<option value="">-- Kies Team --</option>';
+            if(res.status === 'success') {
+               res.data.forEach((r,i) => { if(i>0) sel.innerHTML += `<option value="${r[0]}" data-coach="${r[5]}" data-kleur="${r[3]}">${r[1]}</option>`; });
+            }
+         }).doAction('Teams', 'haalTeamsOp', null);
+      }
+
+      function laadTeamSettings() {
+         const sel = document.getElementById('tmSelectTeam');
+         if(!sel.value) { document.getElementById('tmSettingsContainer').style.display='none'; return; }
+         document.getElementById('tmSettingsContainer').style.display='block';
+         const opt = sel.options[sel.selectedIndex];
+         document.getElementById('tmCoach').value = opt.getAttribute('data-coach');
+         document.getElementById('tmKleur').value = opt.getAttribute('data-kleur');
+      }
+
+      function slaTeamSettingsOp() {
+         // TODO in toekomst: Add team update endpoint to Mod_Teams
+         document.getElementById('tmMelding').innerText = "✅ Team geupdate!";
+      }
+
       function initSticksScherm() {
          // Kan in de toekomst worden uitgebreid om opgeslagen foto's op te halen
       }
@@ -197,6 +279,9 @@
         <select id="roleSwitcher" onchange="wisselRol(this.value)" style="width: 100%; padding: 8px; background: var(--surface); color: white; border: 1px solid var(--border); border-radius: 4px; font-size: 0.9rem; cursor: pointer;">
           <option value="gast">👁️ Rol: Gast / Bezoeker</option>
           <option value="speler">👤 Rol: Speler</option>
+          <option value="teammanager">📋 Rol: Teammanager</option>
+          <option value="scorekeeper">⏱️ Rol: Scorekeeper</option>
+          <option value="league_manager">🏛️ Rol: League Manager</option>
           <option value="beheerder">🛡️ Rol: Beheerder</option>
         </select>
       </div>
@@ -209,17 +294,21 @@
 
       <!-- Specifieke weergaves -->
       <a class="nav-item highlight" data-role="gast" onclick="laadView('Register', this); sluitMobielMenu();">📝 Registreren</a>
+
       <a class="nav-item" data-role="speler" onclick="laadView('Aanvragen', this); sluitMobielMenu();">Team Joinen (Aanvraag)</a>
       <a class="nav-item highlight" data-role="speler" onclick="laadView('Profiel', this); sluitMobielMenu();">👤 Mijn Profiel</a>
       <a class="nav-item highlight" data-role="speler" onclick="laadView('Sticks', this); sluitMobielMenu();">🏒 Mijn Sticks</a>
 
       <div id="beheerder-menu-header" style="padding: 15px 20px 5px 20px; font-size: 0.75rem; color: #737373; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">Beheer & Live</div>
-      <a class="nav-item highlight" data-role="beheerder" onclick="laadView('Live', this); sluitMobielMenu();">🔴 Live Tracker</a>
-      <a class="nav-item" data-role="beheerder" onclick="laadView('Lijnen', this); sluitMobielMenu();">Line-ups</a>
-      <a class="nav-item" data-role="beheerder" onclick="laadView('Competities', this); sluitMobielMenu();">Competities</a>
-      <a class="nav-item" data-role="beheerder" onclick="laadView('Teams', this); sluitMobielMenu();">Teams</a>
-      <a class="nav-item" data-role="beheerder" onclick="laadView('Rosters', this); sluitMobielMenu();">Rosters</a>
+      <a class="nav-item highlight" data-role="beheerder,league_manager,scorekeeper" onclick="laadView('Live', this); sluitMobielMenu();">🔴 Live Tracker</a>
+      <a class="nav-item" data-role="beheerder,league_manager,teammanager" onclick="laadView('Lijnen', this); sluitMobielMenu();">Line-ups</a>
+      <a class="nav-item" data-role="beheerder,league_manager" onclick="laadView('Competities', this); sluitMobielMenu();">Competities</a>
+      <a class="nav-item" data-role="beheerder,league_manager,teammanager" onclick="laadView('Teams', this); sluitMobielMenu();">Teams</a>
+      <a class="nav-item" data-role="beheerder,teammanager" onclick="laadView('Rosters', this); sluitMobielMenu();">Rosters</a>
       <a class="nav-item" data-role="beheerder" onclick="laadView('Users', this); sluitMobielMenu();">Gebruikers</a>
+      <a class="nav-item" data-role="beheerder" onclick="laadView('AdminSettings', this); sluitMobielMenu();">Global Settings</a>
+      <a class="nav-item" data-role="league_manager" onclick="laadView('LeagueManager', this); sluitMobielMenu();">League Settings</a>
+      <a class="nav-item" data-role="teammanager" onclick="laadView('TeamManager', this); sluitMobielMenu();">Team Settings</a>
     </div>
 
     <div class="main-wrapper">
@@ -391,6 +480,9 @@
             else if (viewNaam === 'Lijnen') { initLijnenScherm(); }
             else if (viewNaam === 'Profiel') { initProfielScherm(); }
             else if (viewNaam === 'Sticks') { initSticksScherm(); }
+            else if (viewNaam === 'AdminSettings') { /* init admin */ }
+            else if (viewNaam === 'LeagueManager') { initLeagueManager(); }
+            else if (viewNaam === 'TeamManager') { initTeamManager(); }
             // Register view heeft geen init logica nodig
           })
           .withFailureHandler(function(error) {
@@ -1053,9 +1145,10 @@
 
       function initWedstrijdenScherm() {
         google.script.run.withSuccessHandler(res => {
+          const rol = res.data;
           const adminForm = document.getElementById('admin-match-form');
-          if(adminForm) { adminForm.style.display = (res === true) ? 'block' : 'none'; }
-        }).doAction('Wedstrijden', 'checkIsBeheerder', null);
+          if(adminForm) { adminForm.style.display = (rol === 'Beheerder' || rol === 'Admin' || rol === 'League manager') ? 'block' : 'none'; }
+        }).doAction('Users', 'getUserRole', null);
 
         google.script.run.withSuccessHandler(res => {
           const dropdown = document.getElementById('wedstrijdCompetitie');
@@ -1495,6 +1588,88 @@
         }).doAction('Announcements', 'voegBerichtToe', data);
       }
 
+
+
+      function initLeagueManager() {
+         google.script.run.withSuccessHandler(res => {
+            const sel = document.getElementById('lmCompSelect');
+            sel.innerHTML = '<option value="">-- Kies --</option>';
+            if(res.status === 'success') {
+               res.data.forEach((r,i) => { if(i>0) sel.innerHTML += `<option value="${r[0]}">${r[1]}</option>`; });
+            }
+         }).doAction('Competities', 'haalCompetitiesOp', null);
+
+         google.script.run.withSuccessHandler(res => {
+            const sel = document.getElementById('lmScorekeeperSelect');
+            sel.innerHTML = '<option value="">-- Kies User --</option>';
+            if(res.status === 'success') {
+               res.data.forEach((r,i) => { if(i>0) sel.innerHTML += `<option value="${r[0]}">${r[1]} (${r[3]})</option>`; });
+            }
+         }).doAction('Users', 'haalAlleUsersOp', null);
+
+         google.script.run.withSuccessHandler(res => {
+            const sel = document.getElementById('lmMatchSelect');
+            sel.innerHTML = '<option value="">-- Kies Wedstrijd --</option>';
+            if(res.status === 'success') {
+               res.data.forEach((r,i) => { if(i>0) sel.innerHTML += `<option value="${r[0]}" data-uit="${r[6]}" data-stat="${r[5]}">${r[1]} | ${r[3]} vs ${r[4]}</option>`; });
+            }
+         }).doAction('Wedstrijden', 'haalWedstrijdenOp', null);
+      }
+
+      function wijsScorekeeperToe() {
+         const uid = document.getElementById('lmScorekeeperSelect').value;
+         if(!uid) return alert('Kies een user');
+         google.script.run.withSuccessHandler(res => {
+            document.getElementById('lmMelding').innerText = res.data || res.message;
+            initLeagueManager();
+         }).doAction('Users', 'wijsRolToe', {userId: uid, nieuweRol: 'Scorekeeper'});
+      }
+
+      function laadWedstrijdDataVoorBewerk() {
+         const sel = document.getElementById('lmMatchSelect');
+         if(!sel.value) { document.getElementById('lmEditMatchContainer').style.display='none'; return; }
+         document.getElementById('lmEditMatchContainer').style.display='grid';
+         const opt = sel.options[sel.selectedIndex];
+         document.getElementById('lmEditUitslag').value = opt.getAttribute('data-uit');
+         document.getElementById('lmEditStatus').value = opt.getAttribute('data-stat');
+      }
+
+      function slaBewerkteWedstrijdOp() {
+         const sel = document.getElementById('lmMatchSelect');
+         if(!sel.value) return;
+         const payload = {
+            wedstrijdId: sel.value,
+            uitslag: document.getElementById('lmEditUitslag').value,
+            status: document.getElementById('lmEditStatus').value
+         };
+         google.script.run.withSuccessHandler(res => {
+            document.getElementById('lmMelding').innerText = res.data || res.message;
+         }).doAction('Wedstrijden', 'wijzigWedstrijd', payload);
+      }
+
+      function initTeamManager() {
+         google.script.run.withSuccessHandler(res => {
+            const sel = document.getElementById('tmSelectTeam');
+            sel.innerHTML = '<option value="">-- Kies Team --</option>';
+            if(res.status === 'success') {
+               res.data.forEach((r,i) => { if(i>0) sel.innerHTML += `<option value="${r[0]}" data-coach="${r[5]}" data-kleur="${r[3]}">${r[1]}</option>`; });
+            }
+         }).doAction('Teams', 'haalTeamsOp', null);
+      }
+
+      function laadTeamSettings() {
+         const sel = document.getElementById('tmSelectTeam');
+         if(!sel.value) { document.getElementById('tmSettingsContainer').style.display='none'; return; }
+         document.getElementById('tmSettingsContainer').style.display='block';
+         const opt = sel.options[sel.selectedIndex];
+         document.getElementById('tmCoach').value = opt.getAttribute('data-coach');
+         document.getElementById('tmKleur').value = opt.getAttribute('data-kleur');
+      }
+
+      function slaTeamSettingsOp() {
+         // TODO in toekomst: Add team update endpoint to Mod_Teams
+         document.getElementById('tmMelding').innerText = "✅ Team geupdate!";
+      }
 
       function initSticksScherm() {
          // Kan in de toekomst worden uitgebreid om opgeslagen foto's op te halen
@@ -2002,7 +2177,9 @@
 
         menuItems.forEach(item => {
           const itemRol = item.getAttribute('data-role');
-          if (itemRol === 'all' || itemRol === rol) {
+          if (!itemRol) return;
+          const roles = itemRol.split(',');
+          if (roles.includes('all') || roles.includes(rol)) {
             item.style.display = 'flex';
           } else {
             item.style.display = 'none';
@@ -2010,7 +2187,7 @@
         });
 
         if (beheerHeader) {
-          beheerHeader.style.display = (rol === 'beheerder') ? 'block' : 'none';
+          beheerHeader.style.display = (['beheerder', 'league_manager', 'teammanager', 'scorekeeper'].includes(rol)) ? 'block' : 'none';
         }
 
         const navAll = document.querySelector('.nav-item[data-role="all"]');

@@ -1,0 +1,16 @@
+<!-- VIEW: ADMIN SETTINGS -->
+<div class="admin-card" style="border-top: 4px solid var(--error);">
+  <h3 class="admin-title"><span class="material-symbols-outlined" style="color:var(--error);">settings</span> Global Settings (Admin)</h3>
+  <p style="color: var(--text-muted); font-size: 0.9rem;">Toegang tot systeem brede instellingen, applicatie resets en database configuraties.</p>
+
+  <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:20px;">
+    <h4 style="color:white; margin-top:0;">Globale Applicatie Status</h4>
+    <select class="profiel-input" id="adminAppStatus" style="margin-bottom:15px;">
+       <option value="active">Active (Open voor iedereen)</option>
+       <option value="maintenance">Onderhoudsmodus</option>
+    </select>
+
+    <h4 style="color:white; margin-top:0;">Database Opschonen</h4>
+    <button class="btn" style="background:var(--error); color:white; width:100%; font-weight:bold;" onclick="opschonenDatabase()">Clear Logs & Oude Events</button>
+  </div>
+</div>

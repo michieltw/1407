@@ -4,6 +4,27 @@
 
 var Mod_Users = {
 
+  getUserRole: function() {
+    try {
+      const db = getDatabase();
+      const userEmail = Session.getActiveUser().getEmail();
+      if (!userEmail) return 'Gast';
+
+      const uSheet = db.getSheetByName(CONFIG.TABS.USERS);
+      if(!uSheet) return 'Gast';
+
+      const uData = uSheet.getDataRange().getValues();
+      for(let i = 1; i < uData.length; i++) {
+        if(uData[i][2] === userEmail) {
+          return uData[i][3]; // Kolom 4 is Rol
+        }
+      }
+      return 'Gast';
+    } catch(e) {
+      return 'Gast';
+    }
+  },
+
   voegUserToe: function(data) {
     const db = getDatabase();
     const sheet = db.getSheetByName(CONFIG.TABS.USERS);
@@ -14,6 +35,26 @@ var Mod_Users = {
     const datum = new Date().toLocaleDateString('nl-NL');
     sheet.appendRow([ Utilities.getUuid(), data.naam, data.email, data.rol, datum, data.geboortedatum, data.lengte, data.gewicht, data.hand, data.niveau, data.voorkeursnummer, data.stickMerk, data.stickModel, data.stickBlad, data.stickFlex, data.fotoUrl ]);
     return "✅ Speler succesvol geregistreerd!";
+  },
+
+
+  wijsRolToe: function(data) {
+    if (typeof Mod_Users !== 'undefined' && Mod_Users.getUserRole) {
+       const rol = Mod_Users.getUserRole();
+       if(rol !== 'Beheerder' && rol !== 'Admin' && rol !== 'League manager') {
+          return "❌ Fout: Geen rechten.";
+       }
+    }
+    const db = getDatabase();
+    const sheet = db.getSheetByName(CONFIG.TABS.USERS);
+    const uData = sheet.getDataRange().getValues();
+    for(let i=1; i<uData.length; i++) {
+       if(uData[i][0] === data.userId) {
+          sheet.getRange(i+1, 4).setValue(data.nieuweRol);
+          return "✅ Rol toegewezen!";
+       }
+    }
+    return "❌ Gebruiker niet gevonden.";
   },
 
   haalAlleUsersOp: function() {

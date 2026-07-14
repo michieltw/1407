@@ -15,7 +15,7 @@
     <div class="input-group"><label>Volledige Naam</label><input type="text" id="usrNaam" placeholder="Bijv. Wayne Gretzky"></div>
     <div class="input-group"><label>E-mailadres</label><input type="email" id="usrEmail" placeholder="wayne@nhl.com"></div>
     <div class="input-group"><label>Rol in Applicatie</label>
-      <select id="usrRol"><option value="Speler">Speler</option><option value="Coach">Coach / Manager</option><option value="Beheerder">Beheerder</option></select>
+      <select id="usrRol"><option value="Speler">Speler</option><option value="Coach">Coach / Manager</option><option value="League manager">League manager</option><option value="Teammanager">Teammanager</option><option value="Scorekeeper">Scorekeeper</option><option value="Beheerder">Beheerder</option></select>
     </div>
     <div class="input-group"><label>Profielfoto URL (Optioneel)</label><input type="text" id="usrFoto" placeholder="https://link-naar-foto.jpg"></div>
   </div>

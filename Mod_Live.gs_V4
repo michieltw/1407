@@ -4,7 +4,19 @@
 
 var Mod_Live = {
 
+  checkCanScorekeep: function() {
+    if (typeof Mod_Users !== 'undefined' && Mod_Users.getUserRole) {
+       const rol = Mod_Users.getUserRole();
+       if(rol !== 'Beheerder' && rol !== 'Admin' && rol !== 'League manager' && rol !== 'Scorekeeper') {
+          return false;
+       }
+       return true;
+    }
+    return false; // Fallback
+  },
+
   voegGeavanceerdEventToe: function(payload) {
+    if(!this.checkCanScorekeep()) return "❌ Fout: Geen rechten.";
     const db = getDatabase();
     const sheet = db.getSheetByName(CONFIG.TABS.EVENTS);
     sheet.appendRow([Utilities.getUuid(), payload.wedstrijdId, payload.minuut, payload.type, payload.data, 'Advanced']);
@@ -12,6 +24,7 @@ var Mod_Live = {
   },
 
   finalizeWedstrijd: function(payload) {
+    if(!this.checkCanScorekeep()) return "❌ Fout: Geen rechten.";
     const db = getDatabase();
     const vSheet = db.getSheetByName(CONFIG.TABS.VERSLAGEN);
     vSheet.appendRow([Utilities.getUuid(), payload.wedstrijdId, payload.uitslag, JSON.stringify(payload.stats), JSON.stringify(payload.settings), JSON.stringify(payload.signoff)]);

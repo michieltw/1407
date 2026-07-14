@@ -29,8 +29,11 @@ var Mod_Wedstrijden = {
 
   voegWedstrijdToe: function(data) {
     // Harde check op de backend voordat we wegschrijven
-    if(!this.checkIsBeheerder()) {
-       return "❌ Fout: Je hebt geen beheerdersrechten om wedstrijden in te plannen.";
+    if (typeof Mod_Users !== 'undefined' && Mod_Users.getUserRole) {
+       const rol = Mod_Users.getUserRole();
+       if(rol !== 'Beheerder' && rol !== 'Admin' && rol !== 'League manager') {
+          return "❌ Fout: Je hebt geen beheerdersrechten om wedstrijden in te plannen.";
+       }
     }
 
     const db = getDatabase();
@@ -57,6 +60,46 @@ var Mod_Wedstrijden = {
     }
     // We reverse() zodat de nieuwste of laatst ingeplande bovenaan staan (optioneel aan te passen)
     return resultaat.reverse();
+  },
+
+
+  wijzigWedstrijd: function(data) {
+    if (typeof Mod_Users !== 'undefined' && Mod_Users.getUserRole) {
+       const rol = Mod_Users.getUserRole();
+       if(rol !== 'Beheerder' && rol !== 'Admin' && rol !== 'League manager') {
+          return "❌ Fout: Geen rechten.";
+       }
+    }
+    const db = getDatabase();
+    const sheet = db.getSheetByName(CONFIG.TABS.WEDSTRIJDEN);
+    const wData = sheet.getDataRange().getValues();
+    for(let i=1; i<wData.length; i++) {
+       if(wData[i][0] === data.wedstrijdId) {
+          if(data.uitslag) sheet.getRange(i+1, 8).setValue(data.uitslag);
+          if(data.status) sheet.getRange(i+1, 7).setValue(data.status);
+          return "✅ Wedstrijd gewijzigd!";
+       }
+    }
+    return "❌ Wedstrijd niet gevonden.";
+  },
+
+  verwijderWedstrijd: function(wedstrijdId) {
+    if (typeof Mod_Users !== 'undefined' && Mod_Users.getUserRole) {
+       const rol = Mod_Users.getUserRole();
+       if(rol !== 'Beheerder' && rol !== 'Admin' && rol !== 'League manager') {
+          return "❌ Fout: Geen rechten.";
+       }
+    }
+    const db = getDatabase();
+    const sheet = db.getSheetByName(CONFIG.TABS.WEDSTRIJDEN);
+    const wData = sheet.getDataRange().getValues();
+    for(let i=wData.length-1; i>=1; i--) {
+       if(wData[i][0] === wedstrijdId) {
+          sheet.deleteRow(i+1);
+          return "✅ Wedstrijd verwijderd!";
+       }
+    }
+    return "❌ Wedstrijd niet gevonden.";
   },
 
   haalRuweWedstrijdenOp: function() {

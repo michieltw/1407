@@ -1,0 +1,35 @@
+<!-- VIEW: LEAGUE MANAGER -->
+<div class="admin-card" style="border-top: 4px solid #8b5cf6;">
+  <h3 class="admin-title"><span class="material-symbols-outlined" style="color:#8b5cf6;">gavel</span> League Management</h3>
+  <p style="color: var(--text-muted); font-size: 0.9rem;">Beheer de algemene regels en instellingen voor leagues, en wijs (algemene of wedstrijd specifieke) scorekeepers toe.</p>
+
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Kies Competitie</label>
+      <select id="lmCompSelect" class="profiel-input"><option value="">Laden...</option></select>
+    </div>
+    <div class="form-group">
+      <label>Scorekeeper Toewijzen</label>
+      <select id="lmScorekeeperSelect" class="profiel-input"><option value="">Laden...</option></select>
+    </div>
+  </div>
+  <button class="btn" style="background:#8b5cf6; color:white; width:100%;" onclick="wijsScorekeeperToe()">Toewijzen</button>
+
+  <h4 style="color:white; margin-top:20px; font-size:1.1rem; text-transform:uppercase;">Bewerk Wedstrijden</h4>
+  <div class="form-group">
+     <label>Selecteer Wedstrijd om te bewerken</label>
+     <select id="lmMatchSelect" class="profiel-input" onchange="laadWedstrijdDataVoorBewerk()"><option value="">Laden...</option></select>
+  </div>
+  <div class="grid-2" id="lmEditMatchContainer" style="display:none; padding:15px; background:var(--bg); border:1px solid var(--border); border-radius:8px;">
+     <div class="input-group"><label>Uitslag</label><input type="text" id="lmEditUitslag" class="profiel-input" placeholder="Bijv. 4 - 2"></div>
+     <div class="input-group"><label>Status</label>
+       <select id="lmEditStatus" class="profiel-input">
+         <option value="Gepland">Gepland</option>
+         <option value="Live">Live</option>
+         <option value="Gespeeld">Gespeeld</option>
+       </select>
+     </div>
+     <button class="btn" style="grid-column: 1 / -1; background:#10b981; color:white;" onclick="slaBewerkteWedstrijdOp()">Wijziging Opslaan</button>
+  </div>
+  <div id="lmMelding" style="margin-top: 15px; font-weight: bold; text-align:center;"></div>
+</div>

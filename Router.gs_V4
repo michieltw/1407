@@ -4,7 +4,7 @@
 
 // 1. Deze functie laadt de User Interface wanneer een gebruiker de app opent
 function doGet(e) {
-  return HtmlService.createTemplateFromFile('Index.html_V3')
+  return HtmlService.createTemplateFromFile('Index.html_V4')
       .evaluate()
       .setTitle('IJshockey Manager')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1'); // Zorgt dat het goed schaalt op mobiel
@@ -54,7 +54,11 @@ function getViewHTML(viewNaam) {
     const versions = {
        'Dashboard': 'View_Dashboard.html_V2',
        'Profiel': 'View_Profiel.html',
-       'Sticks': 'View_Sticks.html'
+       'Sticks': 'View_Sticks.html',
+       'Users': 'View_Users.html_V4',
+       'AdminSettings': 'View_AdminSettings.html_V4',
+       'LeagueManager': 'View_LeagueManager.html_V4',
+       'TeamManager': 'View_TeamManager.html_V4'
     };
 
     // We zoeken een bestand in GAS dat heet: View_Users.html of View_Dashboard.html

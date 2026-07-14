@@ -1,0 +1,19 @@
+<!-- VIEW: TEAM MANAGER -->
+<div class="admin-card" style="border-top: 4px solid #10b981;">
+  <h3 class="admin-title"><span class="material-symbols-outlined" style="color:#10b981;">groups</span> Team Management</h3>
+  <p style="color: var(--text-muted); font-size: 0.9rem;">Beheer team gerelateerde zaken, accepteer aanvragen, en organiseer je roster.</p>
+
+  <div class="form-group" style="margin-top:20px;">
+    <label>Selecteer jouw Team</label>
+    <select id="tmSelectTeam" class="profiel-input" onchange="laadTeamSettings()"><option value="">Laden...</option></select>
+  </div>
+
+  <div id="tmSettingsContainer" style="display:none; margin-top:20px; border-top:1px solid var(--border); padding-top:20px;">
+     <div class="grid-2">
+        <div class="input-group"><label>Coach</label><input type="text" id="tmCoach" class="profiel-input"></div>
+        <div class="input-group"><label>Team Kleur</label><input type="color" id="tmKleur" class="profiel-input" style="padding:2px 5px; height:45px;"></div>
+     </div>
+     <button class="btn" style="background:#10b981; color:white; width:100%; margin-top:15px;" onclick="slaTeamSettingsOp()">Team Opslaan</button>
+  </div>
+  <div id="tmMelding" style="margin-top: 15px; font-weight: bold; text-align:center;"></div>
+</div>
