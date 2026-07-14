@@ -18,7 +18,11 @@
 
   .pos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
   .pos-item label { display: block; font-size: 0.75rem; font-weight: bold; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase;}
-  .pos-item select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: white; font-size: 0.9rem; }
+  .pos-item select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: white; font-size: 0.9rem; display: none; }
+  .pos-dropzone { min-height: 40px; border: 2px dashed var(--border); border-radius: 6px; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 5px; color: var(--text-muted); font-size: 0.8rem; transition: 0.2s; }
+  .pos-dropzone.drag-over { border-color: var(--accent); background: rgba(255, 159, 0, 0.1); }
+  .dropped-player { background: var(--surface-hover); padding: 5px 10px; border-radius: 4px; border: 1px solid var(--accent); color: white; font-weight: bold; width: 100%; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+  .dropped-player .remove-btn { color: #ef4444; cursor: pointer; }
 
   .roster-list::-webkit-scrollbar { width: 6px; }
   .roster-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }

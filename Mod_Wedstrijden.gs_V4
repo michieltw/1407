@@ -4,6 +4,45 @@
 
 var Mod_Wedstrijden = {
 
+  haalRSVP: function(matchId) {
+     const db = getDatabase();
+     const sheet = db.getSheetByName(CONFIG.TABS.RSVP);
+     if(!sheet) return [];
+     const data = sheet.getDataRange().getValues();
+     const results = [];
+     for(let i=1; i<data.length; i++) {
+        if(data[i][0] === matchId) results.push({email: data[i][1], status: data[i][2]});
+     }
+     return results;
+  },
+
+  zetRSVP: function(payload) {
+     const db = getDatabase();
+     let sheet = db.getSheetByName(CONFIG.TABS.RSVP);
+     if(!sheet) {
+        sheet = db.insertSheet(CONFIG.TABS.RSVP);
+        sheet.appendRow(["Match_ID", "User_Email", "Status", "Timestamp"]);
+     }
+     const email = Session.getActiveUser().getEmail();
+     if(!email) return "Niet ingelogd.";
+
+     const data = sheet.getDataRange().getValues();
+     let found = false;
+     for(let i=1; i<data.length; i++) {
+        if(data[i][0] === payload.matchId && data[i][1] === email) {
+           sheet.getRange(i+1, 3).setValue(payload.status);
+           sheet.getRange(i+1, 4).setValue(new Date());
+           found = true;
+           break;
+        }
+     }
+     if(!found) {
+        sheet.appendRow([payload.matchId, email, payload.status, new Date()]);
+     }
+     return "RSVP succesvol opgeslagen.";
+  },
+
+
   // HIER DE TOEVOEGING: Check of de ingelogde Google User een Beheerder is
   checkIsBeheerder: function() {
     try {

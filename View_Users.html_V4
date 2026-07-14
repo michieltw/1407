@@ -48,12 +48,34 @@
   <div id="userMelding" style="margin-top: 15px; font-weight: bold; text-align: center;"></div>
 </div>
 
+
+<div class="admin-card" style="border-top: 4px solid var(--accent);">
+  <h3 class="admin-title"><span class="material-symbols-outlined" style="color:var(--accent);">library_add_check</span> Bulk Acties</h3>
+  <div class="grid-3">
+    <div class="input-group">
+      <label>Actie</label>
+      <select id="bulkActionSelect">
+        <option value="">-- Kies Actie --</option>
+        <option value="changeRole">Verander Rol</option>
+        <option value="changeNiveau">Verander Niveau</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>Nieuwe Waarde</label>
+      <input type="text" id="bulkActionValue" placeholder="Nieuwe rol/niveau...">
+    </div>
+    <div class="input-group" style="display:flex; align-items:flex-end;">
+      <button class="btn" style="width:100%; background:var(--accent); color:black;" onclick="executeBulkAction()">Uitvoeren op geselecteerde</button>
+    </div>
+  </div>
+</div>
+
 <div class="admin-card">
   <h3 class="admin-title"><span class="material-symbols-outlined" style="color:var(--text-muted);">group</span> Geregistreerde Gebruikers</h3>
   <div style="overflow-x: auto;">
     <table class="app-table">
       <thead>
-        <tr><th>Naam</th><th>E-mailadres</th><th>Rol</th><th>Aangemaakt</th></tr>
+        <tr><th><input type="checkbox" id="selectAllUsers" onclick="toggleAllUsers(this)"></th><th>Naam</th><th>E-mailadres</th><th>Rol</th><th>Aangemaakt</th></tr>
       </thead>
       <tbody id="usersTableBody">
         <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Laden... ⏳</td></tr>

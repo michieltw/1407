@@ -89,9 +89,18 @@
                 <button class="goal-team-btn huge-team-btn flex-1 border border-outline-variant rounded-lg hover:bg-surface-variant transition-colors text-on-surface bg-surface-variant font-bold" data-team="HOME" id="btn-goal-home">THUIS</button>
                 <button class="goal-team-btn huge-team-btn flex-1 border border-outline-variant rounded-lg hover:bg-surface-variant transition-colors text-on-surface" data-team="AWAY" id="btn-goal-away">UIT</button>
               </div>
-              <select class="goal-log-select goal-player-select huge-select w-full border border-outline-variant rounded-lg bg-surface text-on-surface" id="goal-scorer-select"><option value="">Doelpuntenmaker...</option></select>
-              <select class="goal-log-select goal-player-select huge-select w-full border border-outline-variant rounded-lg bg-surface text-on-surface" id="goal-ast1-select"><option value="">1e Assist (Optioneel)...</option><option>None</option></select>
-              <select class="goal-log-select goal-player-select huge-select w-full border border-outline-variant rounded-lg bg-surface text-on-surface" id="goal-ast2-select"><option value="">2e Assist (Optioneel)...</option><option>None</option></select>
+              <div class="flex flex-col gap-2">
+                <div class="flex justify-between items-center bg-surface p-2 rounded-lg border border-outline-variant">
+                   <div class="text-on-surface font-bold text-sm">G: <span id="goal-scorer-display" class="text-accent">-</span></div>
+                   <div class="text-on-surface font-bold text-sm">A1: <span id="goal-ast1-display" class="text-accent">-</span></div>
+                   <div class="text-on-surface font-bold text-sm">A2: <span id="goal-ast2-display" class="text-accent">-</span></div>
+                   <button id="btn-clear-goal-selections" class="text-error text-xs uppercase font-bold p-1 border border-error rounded hover:bg-error hover:text-white transition">Clear</button>
+                </div>
+                <!-- Player Touch Tiles Grid -->
+                <div id="goal-player-grid" class="grid grid-cols-4 sm:grid-cols-5 gap-2 max-h-48 overflow-y-auto p-1">
+                  <!-- Populated dynamically -->
+                </div>
+              </div>
               <button class="btn-massive btn-action" style="background:#10b981; color:white; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);" id="log-goal-btn">Goal Registreren</button>
             </div>
           </div>
@@ -131,6 +140,12 @@
     </div>
 
     <!-- Title Bar -->
+    <!-- PENALTY TIMERS AREA -->
+    <div id="penalty-timers-container" class="w-full flex justify-between bg-surface border-b border-outline-variant px-4 py-2 min-h-[40px] hidden">
+      <div id="penalty-timers-home" class="flex gap-2 flex-wrap flex-1 justify-start"></div>
+      <div id="penalty-timers-away" class="flex gap-2 flex-wrap flex-1 justify-end"></div>
+    </div>
+
     <div class="bg-surface text-center py-2 border-b border-outline-variant">
       <h1 class="text-lg font-black tracking-wider text-white" id="match-header-title">SELECTEER WEDSTRIJD</h1>
     </div>
@@ -269,7 +284,12 @@
         <div class="flex flex-col gap-4 w-full" id="view-play-by-play">
 
           <!-- HET NIEUWE EN VERBETERDE IJS (RINK) -->
-          <div class="w-full flex justify-center relative px-1 mb-2" id="rink-container">
+          <div class="flex justify-end mb-2 w-full px-2 mt-2">
+               <button class="control-btn p-2 rounded-lg flex items-center justify-center hover:bg-surface-hover text-sm gap-1 border border-outline-variant text-on-surface" id="btn-swap-sides" title="Wissel Aanvalsrichting">
+                 <span class="material-symbols-outlined text-sm" style="font-size: 18px;">swap_horiz</span> Wissel Veld
+               </button>
+            </div>
+            <div class="w-full flex justify-center relative px-1 mb-2" id="rink-container">
             <!-- Full width, controlled aspect ratio, touch-action:none voorkomt scrollen -->
             <div class="w-full bg-[#f8fafc] relative overflow-hidden shadow-2xl"
                  style="max-width: 1200px; aspect-ratio: 1.5 / 1; border-radius: 12%; border: 6px solid var(--primary-nav); touch-action: none;"
