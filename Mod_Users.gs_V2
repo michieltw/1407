@@ -75,7 +75,7 @@ var Mod_Users = {
         }
       }
 
-      let careerData = { user: myUser, team: null, nextGame: null, stats: null, pos: myPos, num: myNum };
+      let careerData = { user: myUser, team: null, nextGame: null, stats: null, pos: myPos, num: myNum, achievements: [] };
 
       // 3. Als hij in een team zit, haal dan de rest op
       if(myTeamId) {
@@ -102,6 +102,10 @@ var Mod_Users = {
             if (myPos === 'Goalie') { careerData.stats = allStats.goalies.find(g => g.naam === myUser.naam); }
             else { careerData.stats = allStats.skaters.find(s => s.naam === myUser.naam); }
          }
+      }
+
+      if (typeof Mod_Achievements !== 'undefined') {
+         careerData.achievements = Mod_Achievements.haalMijnAchievements(myUser.id, myTeamId);
       }
 
       return careerData;

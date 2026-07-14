@@ -75,6 +75,10 @@
            <h2 id="mc-naam">SPELER NAAM</h2>
            <div id="mc-pos" style="color:var(--text-muted); font-weight:800; font-size:1rem; text-transform:uppercase; letter-spacing:1px; margin-top:5px;">POS | #00</div>
 
+           <div id="mc-achievements" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
+              <!-- Dynamische achievements via JS -->
+           </div>
+
            <div class="mc-stats-grid" id="mc-stats-container">
               <!-- Dynamische stats via JS -->
            </div>

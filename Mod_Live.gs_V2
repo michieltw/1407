@@ -18,13 +18,41 @@ var Mod_Live = {
 
     const wSheet = db.getSheetByName(CONFIG.TABS.WEDSTRIJDEN);
     const wData = wSheet.getDataRange().getValues();
+    let thuisId = null;
+    let uitId = null;
     for(let i = 1; i < wData.length; i++) {
       if(wData[i][0] === payload.wedstrijdId) {
+        thuisId = wData[i][4];
+        uitId = wData[i][5];
         wSheet.getRange(i + 1, 7).setValue('Gespeeld');
         wSheet.getRange(i + 1, 8).setValue(payload.uitslag);
         break;
       }
     }
+
+    // Haal events op voor achievement evaluatie
+    const eSheet = db.getSheetByName(CONFIG.TABS.EVENTS);
+    let events = [];
+    if (eSheet) {
+      const eData = eSheet.getDataRange().getValues();
+      for (let i = 1; i < eData.length; i++) {
+        if (eData[i][1] === payload.wedstrijdId) {
+           try {
+             events.push({
+               minuut: eData[i][2],
+               type: eData[i][3],
+               payload: JSON.parse(eData[i][4])
+             });
+           } catch(e) {}
+        }
+      }
+    }
+
+    // Evalueer achievements
+    if (typeof Mod_Achievements !== 'undefined' && Mod_Achievements.evalueerWedstrijd) {
+        Mod_Achievements.evalueerWedstrijd(payload.wedstrijdId, payload.stats, events, thuisId, uitId);
+    }
+
     return "✅ Wedstrijd afgerond en verslag opgeslagen!";
   },
 

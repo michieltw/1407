@@ -14,7 +14,8 @@ const CONFIG = {
     VERSLAGEN: 'Verslagen',
     ANNOUNCEMENTS: 'Announcements',
     AANVRAGEN: 'Aanvragen',
-    LIJNEN: 'Lijnen'
+    LIJNEN: 'Lijnen',
+    ACHIEVEMENTS: 'Achievements'
   }
 };
 
@@ -40,16 +41,6 @@ function setupDatabase() {
   if (!sheet) {
     sheet = db.insertSheet(CONFIG.TABS.COMPETITIES);
     sheet.appendRow(["Competitie_ID", "Naam", "Seizoen", "Niveau", "Status"]);
-    sheet.getRange("A1:E1").setFontWeight("bold").setBackground("#e2e8f0");
-  }
-}
-
-function setupTeamsDatabase() {
-  const db = getDatabase();
-  let sheet = db.getSheetByName(CONFIG.TABS.TEAMS);
-  if (!sheet) {
-    sheet = db.insertSheet(CONFIG.TABS.TEAMS);
-    sheet.appendRow(["Team_ID", "Teamnaam", "Competitie_ID", "Coach", "Status"]);
     sheet.getRange("A1:E1").setFontWeight("bold").setBackground("#e2e8f0");
   }
 }
@@ -124,5 +115,15 @@ function upgradeUsersDatabase() {
     // Overschrijf rij 1 met de nieuwe uitgebreide headers
     sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#e2e8f0");
+  }
+}
+
+
+function setupAchievementsDatabase() {
+  const db = getDatabase();
+  if (!db.getSheetByName(CONFIG.TABS.ACHIEVEMENTS)) {
+    const sheet = db.insertSheet(CONFIG.TABS.ACHIEVEMENTS);
+    sheet.appendRow(["Achievement_ID", "User_ID", "Team_ID", "Achievement_Key", "Datum"]);
+    sheet.getRange("A1:E1").setFontWeight("bold").setBackground("#e2e8f0");
   }
 }
