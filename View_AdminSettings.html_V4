@@ -14,3 +14,27 @@
     <button class="btn" style="background:var(--error); color:white; width:100%; font-weight:bold;" onclick="opschonenDatabase()">Clear Logs & Oude Events</button>
   </div>
 </div>
+
+<div class="admin-card mt-5">
+  <h3 class="admin-title"><span class="material-symbols-outlined" style="color:var(--text-muted);">inventory_2</span> League Inventory & Records</h3>
+  <p class="text-text-muted mb-4">Beheer hier uitrusting, regelementen, locaties en historische records. (Dit is een visuele weergave voor de module. Volledige CRUD kan hieronder worden uitgewerkt).</p>
+
+  <div class="grid-2">
+     <div class="bg-surface-hover p-4 rounded border border-outline-variant">
+         <h4 class="font-bold text-white mb-2 border-b border-outline-variant pb-1">League Records</h4>
+         <button class="btn w-full" style="background:var(--surface-container-high); color:white;">Bekijk & Bewerk Records</button>
+     </div>
+     <div class="bg-surface-hover p-4 rounded border border-outline-variant">
+         <h4 class="font-bold text-white mb-2 border-b border-outline-variant pb-1">Venue Directory</h4>
+         <button class="btn w-full" style="background:var(--surface-container-high); color:white;">Beheer IJsbanen</button>
+     </div>
+     <div class="bg-surface-hover p-4 rounded border border-outline-variant">
+         <h4 class="font-bold text-white mb-2 border-b border-outline-variant pb-1">Division Rules</h4>
+         <button class="btn w-full" style="background:var(--surface-container-high); color:white;">Beheer Reglementen</button>
+     </div>
+     <div class="bg-surface-hover p-4 rounded border border-outline-variant">
+         <h4 class="font-bold text-white mb-2 border-b border-outline-variant pb-1">Equipment / Inventory</h4>
+         <button class="btn w-full" style="background:var(--surface-container-high); color:white;">Beheer Leenspullen</button>
+     </div>
+  </div>
+</div>

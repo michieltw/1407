@@ -52,8 +52,20 @@
         --sidebar-hover: #1a1d24;
       }
 
-      body.app-shell { font-family: 'Hanken Grotesk', system-ui, sans-serif; margin: 0; padding: 0; background-color: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
-
+       body.app-shell { 
+  font-family: 'Hanken Grotesk', system-ui, sans-serif; 
+  margin: 0; 
+  padding: 0; 
+  /* HIER STEL JE DE ACHTERGRONDAFBELDING IN */
+  background-image: url('https://cdn.shopify.com/s/files/1/1038/7203/7203/files/hlboposterblackandwhite.png?v=1784058798');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--text); 
+  display: flex; 
+  height: 100vh; 
+  overflow: hidden; 
+}
       .sidebar { width: 260px; background-color: var(--primary-nav); color: white; display: flex; flex-direction: column; z-index: 100; transition: transform 0.3s ease; flex-shrink: 0; overflow-y: auto; overflow-x: hidden; border-right: 1px solid var(--border); }
       .logo-container { padding: 25px 20px; text-align: center; border-bottom: 1px solid var(--border); margin-bottom: 10px; background: radial-gradient(circle at top, #1a1d24 0%, transparent 100%); }
       .logo-container img { max-width: 100%; height: auto; border-radius: 8px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
@@ -116,147 +128,6 @@
       </div>
     </div>
 
-      function initLeagueManager() {
-         google.script.run.withSuccessHandler(res => {
-            const sel = document.getElementById('lmCompSelect');
-            sel.innerHTML = '<option value="">-- Kies --</option>';
-            if(res.status === 'success') {
-               res.data.forEach((r,i) => { if(i>0) sel.innerHTML += `<option value="${r[0]}">${r[1]}</option>`; });
-            }
-         }).doAction('Competities', 'haalCompetitiesOp', null);
-
-         google.script.run.withSuccessHandler(res => {
-            const sel = document.getElementById('lmScorekeeperSelect');
-            sel.innerHTML = '<option value="">-- Kies User --</option>';
-            if(res.status === 'success') {
-               res.data.forEach((r,i) => { if(i>0) sel.innerHTML += `<option value="${r[0]}">${r[1]} (${r[3]})</option>`; });
-            }
-         }).doAction('Users', 'haalAlleUsersOp', null);
-
-         google.script.run.withSuccessHandler(res => {
-            const sel = document.getElementById('lmMatchSelect');
-            sel.innerHTML = '<option value="">-- Kies Wedstrijd --</option>';
-            if(res.status === 'success') {
-               res.data.forEach((r,i) => { if(i>0) sel.innerHTML += `<option value="${r[0]}" data-uit="${r[6]}" data-stat="${r[5]}">${r[1]} | ${r[3]} vs ${r[4]}</option>`; });
-            }
-         }).doAction('Wedstrijden', 'haalWedstrijdenOp', null);
-      }
-
-      function wijsScorekeeperToe() {
-         const uid = document.getElementById('lmScorekeeperSelect').value;
-         if(!uid) return alert('Kies een user');
-         google.script.run.withSuccessHandler(res => {
-            document.getElementById('lmMelding').innerText = res.data || res.message;
-            initLeagueManager();
-         }).doAction('Users', 'wijsRolToe', {userId: uid, nieuweRol: 'Scorekeeper'});
-      }
-
-      function laadWedstrijdDataVoorBewerk() {
-         const sel = document.getElementById('lmMatchSelect');
-         if(!sel.value) { document.getElementById('lmEditMatchContainer').style.display='none'; return; }
-         document.getElementById('lmEditMatchContainer').style.display='grid';
-         const opt = sel.options[sel.selectedIndex];
-         document.getElementById('lmEditUitslag').value = opt.getAttribute('data-uit');
-         document.getElementById('lmEditStatus').value = opt.getAttribute('data-stat');
-      }
-
-      function slaBewerkteWedstrijdOp() {
-         const sel = document.getElementById('lmMatchSelect');
-         if(!sel.value) return;
-         const payload = {
-            wedstrijdId: sel.value,
-            uitslag: document.getElementById('lmEditUitslag').value,
-            status: document.getElementById('lmEditStatus').value
-         };
-         google.script.run.withSuccessHandler(res => {
-            document.getElementById('lmMelding').innerText = res.data || res.message;
-         }).doAction('Wedstrijden', 'wijzigWedstrijd', payload);
-      }
-
-      function initTeamManager() {
-         google.script.run.withSuccessHandler(res => {
-            const sel = document.getElementById('tmSelectTeam');
-            sel.innerHTML = '<option value="">-- Kies Team --</option>';
-            if(res.status === 'success') {
-               res.data.forEach((r,i) => { if(i>0) sel.innerHTML += `<option value="${r[0]}" data-coach="${r[5]}" data-kleur="${r[3]}">${r[1]}</option>`; });
-            }
-         }).doAction('Teams', 'haalTeamsOp', null);
-      }
-
-      function laadTeamSettings() {
-         const sel = document.getElementById('tmSelectTeam');
-         if(!sel.value) { document.getElementById('tmSettingsContainer').style.display='none'; return; }
-         document.getElementById('tmSettingsContainer').style.display='block';
-         const opt = sel.options[sel.selectedIndex];
-         document.getElementById('tmCoach').value = opt.getAttribute('data-coach');
-         document.getElementById('tmKleur').value = opt.getAttribute('data-kleur');
-      }
-
-      function slaTeamSettingsOp() {
-         // TODO in toekomst: Add team update endpoint to Mod_Teams
-         document.getElementById('tmMelding').innerText = "✅ Team geupdate!";
-      }
-
-      function initSticksScherm() {
-         // Kan in de toekomst worden uitgebreid om opgeslagen foto's op te halen
-      }
-
-      function initProfielScherm() {
-        google.script.run.withSuccessHandler(function(res) {
-          if(res) {
-             document.getElementById('mijnProfielNaam').innerText = res.naam || 'Onbekend';
-             document.getElementById('mijnProfielTeam').innerText = 'Profielgegevens geladen';
-
-             let fotoUrl = (res.fotoUrl && res.fotoUrl.includes('http'))
-               ? res.fotoUrl
-               : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(res.naam || 'Player') + '&background=1f1f1f&color=FF9F00&bold=true&size=200';
-
-             document.getElementById('mijnProfielFoto').src = fotoUrl;
-
-             if(document.getElementById('mpLengte')) document.getElementById('mpLengte').value = res.lengte || '';
-             if(document.getElementById('mpGewicht')) document.getElementById('mpGewicht').value = res.gewicht || '';
-             if(document.getElementById('mpNummer')) document.getElementById('mpNummer').value = res.voorkeursnummer || '';
-             if(document.getElementById('mpStickMerk')) document.getElementById('mpStickMerk').value = res.stickMerk || '';
-             if(document.getElementById('mpStickModel')) document.getElementById('mpStickModel').value = res.stickModel || '';
-             if(document.getElementById('mpStickBlad')) document.getElementById('mpStickBlad').value = res.stickBlad || '';
-             if(document.getElementById('mpStickFlex')) document.getElementById('mpStickFlex').value = res.stickFlex || '';
-             if(document.getElementById('mpFotoUrl')) document.getElementById('mpFotoUrl').value = res.fotoUrl || '';
-             if(document.getElementById('mpBio')) document.getElementById('mpBio').value = res.bio || '';
-          }
-        }).doAction('Users', 'haalMijnProfielData', null);
-      }
-
-      function slaMijnProfielOp() {
-        const btn = document.getElementById('btnOpslaanMijnProfiel');
-        const melding = document.getElementById('mpMelding');
-
-        const data = {
-          lengte: document.getElementById('mpLengte').value,
-          gewicht: document.getElementById('mpGewicht').value,
-          voorkeursnummer: document.getElementById('mpNummer').value,
-          stickMerk: document.getElementById('mpStickMerk').value,
-          stickModel: document.getElementById('mpStickModel').value,
-          stickBlad: document.getElementById('mpStickBlad').value,
-          stickFlex: document.getElementById('mpStickFlex').value,
-          fotoUrl: document.getElementById('mpFotoUrl').value,
-          bio: document.getElementById('mpBio').value
-        };
-
-        btn.disabled = true; btn.innerText = "Bezig...";
-        google.script.run.withSuccessHandler(function(res) {
-          btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined">save</span> Wijzigingen Opslaan';
-          if(res.status === 'success' && !res.data.includes('❌')) {
-            melding.style.color = "#4ade80";
-            melding.innerText = res.data;
-            setTimeout(() => melding.innerText = '', 3000);
-            initProfielScherm(); // Reload updated data
-          } else {
-            melding.style.color = "#ef4444"; melding.innerText = res.data || res.message;
-          }
-        }).doAction('Users', 'updateMijnProfiel', data);
-      }
-
-    </script>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         if(!sessionStorage.getItem('termsAccepted')) {
@@ -427,7 +298,7 @@
       </div>
     </div>
 
-    <script>
+<script>
       // ==========================================
       // HELPER: Anti-crash String Escaper
       // ==========================================
@@ -496,7 +367,12 @@
             homeTeam: 'THUIS', awayTeam: 'UIT', homeColor: '#3b82f6', awayColor: '#ef4444',
             homeId: null, awayId: null, dbMatchId: null,
             stats: { HOME: { score: 0, shots: 0, saves: 0, faceoffs: 0, penalties: 0 }, AWAY: { score: 0, shots: 0, saves: 0, faceoffs: 0, penalties: 0 } },
-            ui: { selectedPenaltyTeam: 'HOME', selectedGoalTeam: 'HOME' }, rosters: { HOME: [], AWAY: [] }
+            ui: { selectedPenaltyTeam: 'HOME', selectedGoalTeam: 'HOME', swapSides: false }, rosters: { HOME: [], AWAY: [] },
+            penalties: { HOME: [], AWAY: [] },
+            goalSelections: { scorer: null, ast1: null, ast2: null, mode: 'scorer' },
+            events: [],
+            period: 1
+
         };
 
         const DOM = {
@@ -505,12 +381,55 @@
             rink: { container: document.getElementById('interactive-rink'), areaLii: document.getElementById('rink-lii'), areaTor: document.getElementById('rink-tor') },
             navigation: { controls: document.querySelectorAll('.control-btn'), tabs: document.querySelectorAll('.tab-btn'), viewsContainer: document.getElementById('views-container'), mainViews: [ document.getElementById('view-pre-game'), document.getElementById('view-match'), document.getElementById('view-post-game') ], headerTabs: document.getElementById('header-tabs') },
             modal: { container: document.getElementById('whistle-modal'), btnWhistle: document.getElementById('btn-whistle'), btnClose: document.getElementById('close-modal'), btnResume: document.getElementById('resume-play'), actionBtns: document.querySelectorAll('.modal-action-btn') },
+            rinkExtra: { btnSwapSides: document.getElementById('btn-swap-sides') },
+            penaltyTimers: { container: document.getElementById('penalty-timers-container'), home: document.getElementById('penalty-timers-home'), away: document.getElementById('penalty-timers-away') },
+            goalGrid: { container: document.getElementById('goal-player-grid'), scorerDisp: document.getElementById('goal-scorer-display'), ast1Disp: document.getElementById('goal-ast1-display'), ast2Disp: document.getElementById('goal-ast2-display'), btnClear: document.getElementById('btn-clear-goal-selections') },
+
             feed: { list: document.getElementById('play-by-play-list') },
-            settings: { gasImport: document.getElementById('gas-match-import'), homeTeam: document.getElementById('home-team'), awayTeam: document.getElementById('away-team'), inputMinutes: document.getElementById('settings-minutes'), inputPeriods: document.getElementById('settings-periods'), btnSaveStart: document.getElementById('btn-save-start'), selectMatch: document.getElementById('live-match-select') },
+            settings: { btnStartQuickGame: document.getElementById('btn-start-quick-game'), gasImport: document.getElementById('gas-match-import'), homeTeam: document.getElementById('home-team'), awayTeam: document.getElementById('away-team'), inputMinutes: document.getElementById('settings-minutes'), inputPeriods: document.getElementById('settings-periods'), btnSaveStart: document.getElementById('btn-save-start'), selectMatch: document.getElementById('live-match-select') },
             roster: { homeList: document.getElementById('home-roster-list'), awayList: document.getElementById('away-roster-list') },
             stats: { shotsH: document.getElementById('stat-shots-home'), shotsA: document.getElementById('stat-shots-away'), barShotsH: document.getElementById('bar-shots-home'), barShotsA: document.getElementById('bar-shots-away'), foH: document.getElementById('stat-fo-home'), foA: document.getElementById('stat-fo-away'), barFoH: document.getElementById('bar-fo-home'), barFoA: document.getElementById('bar-fo-away'), goalsH: document.getElementById('stat-goals-home'), goalsA: document.getElementById('stat-goals-away'), penH: document.getElementById('stat-pen-home'), penA: document.getElementById('stat-pen-away') },
             postgame: { btnFinalize: document.getElementById('btn-postgame-finalize'), scorer: document.getElementById('final-scorer'), ref: document.getElementById('final-ref') }
         };
+
+
+        if(DOM.settings.btnStartQuickGame) {
+           DOM.settings.btnStartQuickGame.addEventListener('click', () => {
+              DOM.settings.btnStartQuickGame.innerText = 'Spelers ophalen...';
+              google.script.run.withSuccessHandler(res => {
+                 DOM.settings.btnStartQuickGame.innerHTML = '<span class="material-symbols-outlined">group</span> Start Quick Game';
+                 if(res.status !== 'success') { alert(res.message); return; }
+
+                 const players = res.data.slice(1);
+                 const hRoster = [];
+                 const aRoster = [];
+
+                 // Sort by level randomly approx
+                 const getLevel = (p) => {
+                    const niv = p[9];
+                    if(niv === 'Pro' || niv === 'Pro / Elite') return 3;
+                    if(niv === 'Amateur') return 2;
+                    return 1;
+                 };
+                 players.sort((a,b) => getLevel(b) - getLevel(a));
+
+                 // Niveau is in column 9 (index 9). High: Pro, Medium: Amateur, Low: Recreatief
+                 // Distribute evenly
+                 players.forEach((p, idx) => {
+                    const spelerObj = { number: p[10] || Math.floor(Math.random()*99)+1, name: p[1], id: p[0] };
+                    if(idx % 4 === 0 || idx % 4 === 3) hRoster.push(spelerObj);
+                    else aRoster.push(spelerObj);
+                 });
+
+                 DOM.settings.homeTeam.value = 'Team Thuis';
+                 DOM.settings.awayTeam.value = 'Team Uit';
+                 populateRosterList(DOM.roster.homeList, hRoster);
+                 populateRosterList(DOM.roster.awayList, aRoster);
+                 alert('Quick Game rosters geladen. Controleer de instellingen en klik op Opslaan & Start.');
+              }).doAction('Users', 'haalAlleUsersOp', null);
+           });
+        }
+
 
         if(DOM.settings.gasImport) {
           google.script.run.withSuccessHandler(function(res) {
@@ -606,7 +525,52 @@
             DOM.scoreboard.headerTitle.innerText = AppState.homeTeam + ' vs ' + AppState.awayTeam;
 
             if(DOM.settings.inputMinutes) AppState.clockSeconds = parseInt(DOM.settings.inputMinutes.value) * 60;
-            updateClockDisplay();
+
+        function generatePDFGameSheet() {
+           const { jsPDF } = window.jspdf;
+           const doc = new jsPDF();
+
+           doc.setFontSize(22);
+           doc.text("Official Game Sheet", 20, 20);
+
+           doc.setFontSize(12);
+           doc.text("Date: " + new Date().toLocaleDateString(), 20, 30);
+           doc.text("Match ID: " + (AppState.dbMatchId || 'Quick Game'), 20, 40);
+
+           doc.setFontSize(16);
+           doc.text(AppState.homeTeam + " vs " + AppState.awayTeam, 20, 60);
+
+           doc.setFontSize(20);
+           doc.text(AppState.stats.HOME.score + " - " + AppState.stats.AWAY.score, 100, 60);
+
+           doc.setFontSize(12);
+           doc.text("Shots: " + AppState.stats.HOME.shots + " - " + AppState.stats.AWAY.shots, 20, 75);
+           doc.text("Penalties: " + AppState.stats.HOME.penalties + " - " + AppState.stats.AWAY.penalties, 20, 85);
+
+           doc.setFontSize(14);
+           doc.text("Events Log:", 20, 105);
+           doc.setFontSize(10);
+           let yOffset = 115;
+
+           // Reverse back to chronological order for PDF
+           const chronEvents = [...AppState.events].sort((a,b) => a.id.localeCompare(b.id)); // simple sort by ID since ID is Date.now() based
+
+           chronEvents.forEach(ev => {
+              if(yOffset > 280) { doc.addPage(); yOffset = 20; }
+              const txt = `[${ev.period} - ${ev.time}s] ${ev.team} | ${ev.type}: ${ev.title} (${ev.subtitle})`;
+              doc.text(txt, 20, yOffset);
+              yOffset += 8;
+           });
+
+           doc.setFontSize(12);
+           if(yOffset > 250) { doc.addPage(); yOffset = 20; }
+           doc.text("Scorer: " + DOM.postgame.scorer.value, 20, yOffset + 20);
+           doc.text("Referee: " + DOM.postgame.ref.value, 20, yOffset + 30);
+
+           doc.save('GameSheet_' + (AppState.dbMatchId || 'Game') + '.pdf');
+        }
+
+        updateClockDisplay();
 
             const hdrHome = document.getElementById('lines-hdr-home'); if(hdrHome) hdrHome.innerText = AppState.homeTeam;
             const hdrAway = document.getElementById('lines-hdr-away'); if(hdrAway) hdrAway.innerText = AppState.awayTeam;
@@ -719,9 +683,39 @@
           const displayStr = mins.toString().padStart(2, '0') + ':' + secs.toString().padStart(2, '0');
           if(DOM.clock.main) DOM.clock.main.textContent = displayStr;
           if(DOM.clock.modal) DOM.clock.modal.textContent = displayStr;
+          updatePenaltyTimersDisplay();
         }
-        function startClock() { if (!AppState.isRunning) { AppState.isRunning = true; if(DOM.clock.btnToggle) DOM.clock.btnToggle.innerHTML = '<span class="material-symbols-outlined">pause</span>'; AppState.clockInterval = setInterval(() => { if (AppState.clockSeconds > 0) { AppState.clockSeconds--; updateClockDisplay(); } else stopClock(); }, 1000); } }
+        function startClock() {
+          if (!AppState.isRunning) {
+            AppState.isRunning = true;
+            if(DOM.clock.btnToggle) DOM.clock.btnToggle.innerHTML = '<span class="material-symbols-outlined">pause</span>';
+            AppState.clockInterval = setInterval(() => {
+              if (AppState.clockSeconds > 0) {
+                AppState.clockSeconds--;
+
+                // Tick penalties
+                ['HOME', 'AWAY'].forEach(team => {
+                   AppState.penalties[team].forEach(p => {
+                      if(p.seconds > 0) p.seconds--;
+                   });
+                   // Remove expired penalties
+                   AppState.penalties[team] = AppState.penalties[team].filter(p => p.seconds > 0);
+                });
+
+                updateClockDisplay();
+              } else {
+                stopClock();
+                handlePeriodEnd();
+              }
+            }, 1000);
+          }
+        }
         function stopClock() { AppState.isRunning = false; if(DOM.clock.btnToggle) DOM.clock.btnToggle.innerHTML = '<span class="material-symbols-outlined">play_arrow</span>'; clearInterval(AppState.clockInterval); }
+
+        function handlePeriodEnd() {
+           alert("Periode afgelopen! Start de volgende periode, Overtime of Shootout via het menu.");
+           if(DOM.modal.container) DOM.modal.container.classList.remove('hidden');
+        }
 
         if(DOM.clock.btnToggle) DOM.clock.btnToggle.addEventListener('click', () => { if(AppState.isRunning) stopClock(); else startClock(); });
         if(DOM.clock.btnPlus) DOM.clock.btnPlus.addEventListener('click', () => { AppState.clockSeconds++; updateClockDisplay(); });
@@ -733,6 +727,41 @@
             if(DOM.scoreboard.period) DOM.scoreboard.period.innerText = e.target.value;
             if(DOM.settings.inputMinutes) AppState.clockSeconds = parseInt(DOM.settings.inputMinutes.value) * 60; updateClockDisplay();
           });
+        }
+
+        function updatePenaltyTimersDisplay() {
+           if(!DOM.penaltyTimers) return;
+           const formatTime = (secs) => Math.floor(secs/60) + ':' + (secs%60).toString().padStart(2, '0');
+           const renderTimers = (team) => {
+              const active = AppState.penalties[team];
+              if(active.length === 0) return '';
+              return active.map(p => '<span class="bg-error text-white text-xs font-bold px-2 py-1 rounded" data-id="' + p.id + '">#' + p.playerNum + ' - ' + formatTime(p.seconds) + '</span>').join('');
+           };
+
+           const hHtml = renderTimers('HOME');
+           const aHtml = renderTimers('AWAY');
+
+           if(hHtml || aHtml) {
+              DOM.penaltyTimers.container.classList.remove('hidden');
+              DOM.penaltyTimers.home.innerHTML = hHtml;
+              DOM.penaltyTimers.away.innerHTML = aHtml;
+           } else {
+              DOM.penaltyTimers.container.classList.add('hidden');
+           }
+        }
+
+        function releasePenalty(team) {
+           const teamPens = AppState.penalties[team];
+           if(teamPens.length > 0) {
+              // Find the one with least time remaining (min seconds)
+              let minPen = teamPens[0];
+              for(let i=1; i<teamPens.length; i++) {
+                 if(teamPens[i].seconds < minPen.seconds) minPen = teamPens[i];
+              }
+              // Remove it
+              AppState.penalties[team] = teamPens.filter(p => p.id !== minPen.id);
+              updatePenaltyTimersDisplay();
+           }
         }
 
         function updateStatsUI() {
@@ -755,22 +784,78 @@
             }
         };
 
-        function addEventToFeed(teamKey, title, subtitle, badgeText = '') {
+        function addEventToFeed(teamKey, title, subtitle, badgeText = '', eventType = null, rawData = null) {
             if (!DOM.feed.list) return;
+            const eventId = "ev_" + Date.now();
+            if(eventType) {
+               AppState.events.push({ id: eventId, team: teamKey, type: eventType, title: title, subtitle: subtitle, raw: rawData, time: AppState.clockSeconds, period: DOM.scoreboard.period ? DOM.scoreboard.period.innerText : "1st" });
+            }
+
             const bgClass = teamKey === 'HOME' ? 'bg-home-team' : 'bg-away-team';
             const txtClass = teamKey === 'HOME' ? 'text-home-team' : 'text-away-team';
             const tAfk = teamKey === 'HOME' ? AppState.homeTeam : AppState.awayTeam;
             const timeText = DOM.clock.main ? DOM.clock.main.textContent : "00:00";
             const periodText = DOM.scoreboard.period ? DOM.scoreboard.period.innerText : "1st";
 
-            DOM.feed.list.insertAdjacentHTML('afterbegin', '<div class="flex items-center gap-4 bg-surface-container-high p-3 rounded-lg border border-outline-variant mt-2"><div class="w-12 h-12 rounded-full ' + bgClass + ' flex items-center justify-center"><span class="font-bold text-white">' + tAfk.substring(0,1) + '</span></div><div class="flex-1 flex flex-col"><span class="font-bold text-on-surface">' + title + '</span><span class="text-sm opacity-70 text-on-surface">' + subtitle + '</span><span class="text-xs opacity-50 text-on-surface">' + periodText + ' - ' + timeText + '</span></div><div class="' + txtClass + ' font-bold text-sm">' + badgeText + '</div></div>');
+            const row = document.createElement('div');
+            row.id = eventId;
+            row.className = 'flex items-center gap-4 bg-surface-container-high p-3 rounded-lg border border-outline-variant mt-2';
+            row.innerHTML = '<div class="w-12 h-12 rounded-full ' + bgClass + ' flex items-center justify-center"><span class="font-bold text-white">' + tAfk.substring(0,1) + '</span></div><div class="flex-1 flex flex-col"><span class="font-bold text-on-surface">' + title + '</span><span class="text-sm opacity-70 text-on-surface">' + subtitle + '</span><span class="text-xs opacity-50 text-on-surface">' + periodText + ' - ' + timeText + '</span></div><div class="' + txtClass + ' font-bold text-sm">' + badgeText + '</div><button class="btn-undo-event p-1 text-on-surface-variant hover:text-error transition"><span class="material-symbols-outlined" style="font-size:18px;">delete</span></button>';
+
+            row.querySelector('.btn-undo-event').addEventListener('click', () => {
+               undoEvent(eventId);
+               row.remove();
+            });
+
+            DOM.feed.list.insertAdjacentElement('afterbegin', row);
+        }
+
+        function undoEvent(eventId) {
+           const evIdx = AppState.events.findIndex(e => e.id === eventId);
+           if(evIdx === -1) return;
+           const ev = AppState.events[evIdx];
+
+           if(ev.type === 'GOAL') {
+              AppState.stats[ev.team].score--;
+              AppState.stats[ev.team].shots--;
+              if(DOM.scoreboard.homeScore && ev.team === 'HOME') DOM.scoreboard.homeScore.innerText = AppState.stats.HOME.score;
+              if(DOM.scoreboard.awayScore && ev.team === 'AWAY') DOM.scoreboard.awayScore.innerText = AppState.stats.AWAY.score;
+           } else if(ev.type === 'SHOT') {
+              AppState.stats[ev.team].shots--;
+              const opp = ev.team === 'HOME' ? 'AWAY' : 'HOME';
+              AppState.stats[opp].saves--;
+           } else if(ev.type === 'PENALTY') {
+              AppState.stats[ev.team].penalties--;
+              // Also remove from active penalties if it's there
+              AppState.penalties[ev.team] = AppState.penalties[ev.team].filter(p => p.id !== ev.raw.penaltyId);
+              updatePenaltyTimersDisplay();
+           } else if(ev.type === 'FACEOFF_WON') {
+              AppState.stats[ev.team].faceoffs--;
+           }
+           updateStatsUI();
+           AppState.events.splice(evIdx, 1);
+        }
+
+        if(DOM.rinkExtra.btnSwapSides) {
+          DOM.rinkExtra.btnSwapSides.addEventListener('click', () => {
+             AppState.ui.swapSides = !AppState.ui.swapSides;
+             DOM.rinkExtra.btnSwapSides.classList.toggle('bg-surface-hover');
+             DOM.rinkExtra.btnSwapSides.classList.toggle('border-accent');
+             DOM.rinkExtra.btnSwapSides.classList.toggle('text-accent');
+
+             // Swap visually by modifying flex direction or colors if needed
+             // Simple indication: swap the SVG rects logic later in the click handler
+          });
         }
 
         if(DOM.rink.container) {
           DOM.rink.container.addEventListener('click', (e) => {
               const rect = DOM.rink.container.getBoundingClientRect();
-              const pctX = ((e.clientX - rect.left) / rect.width) * 100;
-              const pctY = ((e.clientY - rect.top) / rect.height) * 100;
+              let pctX = ((e.clientX - rect.left) / rect.width) * 100;
+              let pctY = ((e.clientY - rect.top) / rect.height) * 100;
+
+              if(AppState.ui.swapSides) pctX = 100 - pctX;
+
               const aanvallendTeam = pctX < 50 ? 'HOME' : 'AWAY';
               const verdedigendTeam = aanvallendTeam === 'HOME' ? 'AWAY' : 'HOME';
 
@@ -883,7 +968,8 @@
             google.script.run.withSuccessHandler(function(res) {
                 if(res.status === 'success') {
                     DOM.postgame.btnFinalize.innerText = "✅ Opgeslagen!";
-                    alert(res.data);
+                    generatePDFGameSheet();
+                    alert(res.data + '\nPDF Game Sheet wordt gedownload.');
                 } else {
                     DOM.postgame.btnFinalize.innerText = "❌ Fout";
                     DOM.postgame.btnFinalize.disabled = false;
@@ -894,6 +980,29 @@
 
         updateClockDisplay();
       }
+
+
+      window.toggleAllUsers = function(source) {
+         const checkboxes = document.querySelectorAll('.user-bulk-check');
+         checkboxes.forEach(cb => cb.checked = source.checked);
+      };
+
+      window.executeBulkAction = function() {
+         const action = document.getElementById('bulkActionSelect').value;
+         const value = document.getElementById('bulkActionValue').value;
+         if(!action || !value) { alert("Vul actie en nieuwe waarde in."); return; }
+
+         const checkboxes = document.querySelectorAll('.user-bulk-check:checked');
+         const userIds = Array.from(checkboxes).map(cb => cb.value);
+
+         if(userIds.length === 0) { alert("Selecteer minimaal 1 gebruiker."); return; }
+
+         // Assuming Mod_Users backend supports this or we create one
+         google.script.run.withSuccessHandler(res => {
+            alert(res);
+            haalGebruikersOp();
+         }).doAction('Users', 'bulkUpdateUsers', { userIds: userIds, action: action, value: value });
+      };
 
       function haalGebruikersOp() {
         document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="4">Laden...</td></tr>';
@@ -917,7 +1026,13 @@
             let safeCurve = escapeJS(res.data[i][13] || '');
             let safeFlex = escapeJS(res.data[i][14] || '');
 
-            html += '<tr onclick="openSpelerProfiel(\'' + safeNaam + '\', \'' + safeRol + '\', \'' + safeFoto + '\', \'' + safeMerk + '\', \'' + safeModel + '\', \'' + safeCurve + '\', \'' + safeFlex + '\')" style="cursor:pointer;" class="hover:bg-surface-container-highest transition-colors"><td>' + naamMetFoto + '</td><td>' + res.data[i][2] + '</td><td>' + res.data[i][3] + '</td><td><span class="badge">' + res.data[i][4] + '</span></td></tr>';
+            html += '<tr class="hover:bg-surface-container-highest transition-colors">';
+            html += '<td onclick="event.stopPropagation()"><input type="checkbox" class="user-bulk-check" value="' + res.data[i][0] + '" style="cursor:pointer; width:16px; height:16px;"></td>';
+            html += '<td onclick="openSpelerProfiel(\'' + safeNaam + '\', \'' + safeRol + '\', \'' + safeFoto + '\', \'' + safeMerk + '\', \'' + safeModel + '\', \'' + safeCurve + '\', \'' + safeFlex + '\')" style="cursor:pointer;">' + naamMetFoto + '</td>';
+            html += '<td onclick="openSpelerProfiel(\'' + safeNaam + '\', \'' + safeRol + '\', \'' + safeFoto + '\', \'' + safeMerk + '\', \'' + safeModel + '\', \'' + safeCurve + '\', \'' + safeFlex + '\')" style="cursor:pointer;">' + res.data[i][2] + '</td>';
+            html += '<td onclick="openSpelerProfiel(\'' + safeNaam + '\', \'' + safeRol + '\', \'' + safeFoto + '\', \'' + safeMerk + '\', \'' + safeModel + '\', \'' + safeCurve + '\', \'' + safeFlex + '\')" style="cursor:pointer;">' + res.data[i][3] + '</td>';
+            html += '<td onclick="openSpelerProfiel(\'' + safeNaam + '\', \'' + safeRol + '\', \'' + safeFoto + '\', \'' + safeMerk + '\', \'' + safeModel + '\', \'' + safeCurve + '\', \'' + safeFlex + '\')" style="cursor:pointer;"><span class="badge">' + res.data[i][4] + '</span></td>';
+            html += '</tr>';
           }
           document.getElementById('usersTableBody').innerHTML = html;
         }).doAction('Users', 'haalAlleUsersOp', null);
@@ -1160,6 +1275,26 @@
         google.script.run.withSuccessHandler(res => { if(res.status === 'success') globaalTeamsData = res.data; }).doAction('Teams', 'haalTeamsOp', null);
         haalWedstrijdenOp();
       }
+
+
+      window.submitRSVP = function(matchId, status) {
+         google.script.run.withSuccessHandler(res => {
+            alert(res.data || res);
+            // Visual feedback
+            const container = document.querySelector('.rsvp-container[data-match="' + matchId + '"]');
+            if(container) {
+               const btns = container.querySelectorAll('button');
+               btns.forEach(b => {
+                  b.classList.remove('bg-accent', 'bg-error', 'text-white');
+                  b.classList.add('bg-surface-hover', 'text-on-surface');
+                  if(b.innerText.includes(status)) {
+                     b.classList.add(status === 'Aanwezig' ? 'bg-accent' : 'bg-error', 'text-white');
+                     b.classList.remove('bg-surface-hover', 'text-on-surface');
+                  }
+               });
+            }
+         }).doAction('Wedstrijden', 'zetRSVP', { matchId: matchId, status: status });
+      };
 
       function filterTeamsVoorWedstrijd() {
         const compId = document.getElementById('wedstrijdCompetitie').value; const thuisDrop = document.getElementById('wedstrijdThuis'); const uitDrop = document.getElementById('wedstrijdUit');
@@ -1587,6 +1722,8 @@
         }).doAction('Announcements', 'voegBerichtToe', data);
       }
 
+
+
       function initLeagueManager() {
          google.script.run.withSuccessHandler(res => {
             const sel = document.getElementById('lmCompSelect');
@@ -1727,8 +1864,6 @@
         }).doAction('Users', 'updateMijnProfiel', data);
       }
 
-    </script>
-    <script>
       document.addEventListener('DOMContentLoaded', () => {
         // App forceert bij opstarten de Gast-rol
         wisselRol('gast');

@@ -15,7 +15,12 @@ const CONFIG = {
     ANNOUNCEMENTS: 'Announcements',
     AANVRAGEN: 'Aanvragen',
     LIJNEN: 'Lijnen',
-    ACHIEVEMENTS: 'Achievements'
+    ACHIEVEMENTS: 'Achievements',
+    RECORDS: 'LeagueRecords',
+    VENUES: 'Venues',
+    RULES: 'Rules',
+    INVENTORY: 'Inventory',
+    RSVP: 'RSVP'
   }
 };
 
@@ -34,6 +39,31 @@ function setupTeamsDatabase() {
 
 
 function setupDatabase() {
+  const db = getDatabase();
+
+  if (!db.getSheetByName(CONFIG.TABS.RECORDS)) {
+    const sheet = db.insertSheet(CONFIG.TABS.RECORDS);
+    sheet.appendRow(["ID", "Title", "Description", "Holder"]);
+  }
+  if (!db.getSheetByName(CONFIG.TABS.VENUES)) {
+    const sheet = db.insertSheet(CONFIG.TABS.VENUES);
+    sheet.appendRow(["ID", "Name", "Address", "MapsURL"]);
+  }
+  if (!db.getSheetByName(CONFIG.TABS.RULES)) {
+    const sheet = db.insertSheet(CONFIG.TABS.RULES);
+    sheet.appendRow(["ID", "RuleTitle", "Content", "Active"]);
+  }
+  if (!db.getSheetByName(CONFIG.TABS.INVENTORY)) {
+    const sheet = db.insertSheet(CONFIG.TABS.INVENTORY);
+    sheet.appendRow(["ID", "ItemName", "Status", "AssignedTo"]);
+  }
+  const db = getDatabase();
+
+  if (!db.getSheetByName(CONFIG.TABS.RSVP)) {
+    const sheet = db.insertSheet(CONFIG.TABS.RSVP);
+    sheet.appendRow(["Match_ID", "User_Email", "Status", "Timestamp"]);
+    sheet.getRange("A1:D1").setFontWeight("bold").setBackground("#e2e8f0");
+  }
   const db = getDatabase();
   let sheet = db.getSheetByName(CONFIG.TABS.COMPETITIES);
   if (!sheet) {
