@@ -1,0 +1,146 @@
+<style>
+  /* Standaard Hero */
+  .dash-hero { position: relative; border-radius: 16px; overflow: hidden; margin-bottom: 30px; min-height: 260px; display: flex; flex-direction: column; justify-content: flex-end; padding: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); border: 1px solid var(--border); background: url('https://images.unsplash.com/photo-1515523110800-9415d13b84a8?auto=format&fit=crop&w=1200&q=80') center/cover; }
+  .dash-hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(9, 10, 15, 0.95) 0%, rgba(9, 10, 15, 0.4) 50%, transparent 100%); z-index: 1; }
+  .dash-hero-content { position: relative; z-index: 2; }
+  .dash-hero h2 { color: white; margin: 0 0 5px 0; font-size: 2.5rem; font-weight: 900; letter-spacing: -0.5px; text-transform: uppercase; }
+  .dash-hero p { color: var(--accent); margin: 0; font-weight: 800; font-size: 1rem; letter-spacing: 2px; text-transform: uppercase; }
+
+  /* My Career Hero */
+  .mc-hero { display: flex; flex-direction: column; border-radius: 16px; overflow: hidden; margin-bottom: 30px; border: 1px solid var(--border); box-shadow: 0 15px 40px rgba(0,0,0,0.4); position: relative; }
+  @media(min-width: 768px) { .mc-hero { flex-direction: row; align-items: stretch; } }
+  .mc-left { flex: 1; padding: 30px; position: relative; z-index: 2; display: flex; align-items: center; gap: 25px; }
+  .mc-avatar { width: 110px; height: 110px; border-radius: 50%; border: 4px solid var(--surface); box-shadow: 0 10px 25px rgba(0,0,0,0.5); object-fit: cover; background: var(--bg); flex-shrink:0; }
+  .mc-info h2 { color: white; margin: 0 0 5px 0; font-size: 2.2rem; font-weight: 900; letter-spacing: -0.5px; text-transform: uppercase; line-height: 1.1; }
+  .mc-right { width: 100%; background: rgba(0,0,0,0.3); padding: 30px; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid var(--border); }
+  @media(min-width: 768px) { .mc-right { width: 350px; border-top: none; border-left: 1px solid var(--border); } }
+
+  .mc-stats-grid { display: flex; gap: 15px; margin-top: 20px; }
+  .mc-stat-box { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px 5px; text-align: center; }
+  .mc-stat-val { font-size: 1.6rem; font-weight: 900; color: white; line-height: 1; }
+  .mc-stat-lbl { font-size: 0.7rem; font-weight: 900; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+
+  /* Rest of widgets */
+  .widget-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
+  .widget-card { background: var(--surface); padding: 25px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; flex-direction: column; }
+  .widget-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 12px; margin-bottom: 15px; }
+  .widget-title { margin: 0; font-size: 1.1rem; color: white; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; font-weight: 800; }
+  .dash-select { background: var(--bg); color: white; border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; font-size: 0.8rem; font-weight: bold; outline: none; cursor: pointer; transition: 0.2s; }
+
+  .dash-compact-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .dash-compact-table th { text-align: left; padding: 10px 8px; color: var(--text-muted); border-bottom: 1px solid var(--border); font-weight: 800; text-transform: uppercase; font-size: 0.7rem; background: transparent !important; }
+  .dash-compact-table td { padding: 12px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); color: white; }
+  .dash-compact-table tr:last-child td { border-bottom: none; }
+
+  .dash-toggle-group { display: flex; gap: 5px; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
+  .dash-toggle-btn { flex: 1; background: transparent; color: var(--text-muted); border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; transition: all 0.2s; }
+  .dash-toggle-btn.active { background: var(--surface-hover); color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
+  .game-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); transition: background 0.2s; }
+  .game-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .game-row:hover { background: rgba(255,255,255,0.02); }
+  .team-name { font-size: 1.15rem; color: white; font-weight: 700; display: block; margin-top: 4px; }
+  .score-display { font-size: 1.5rem; font-weight: 900; color: white; font-variant-numeric: tabular-nums; background: var(--primary-nav); padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); }
+  .score-highlight { color: var(--accent); border-color: rgba(255, 159, 0, 0.3); background: rgba(255, 159, 0, 0.05); }
+
+  @keyframes pulse-live { 0% { opacity: 1; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+  .live-indicator { display: inline-flex; align-items: center; gap: 8px; color: #ef4444; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px; border: 1px solid rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.1); padding: 4px 10px; border-radius: 4px; text-transform: uppercase; }
+  .live-dot { width: 8px; height: 8px; background-color: #ef4444; border-radius: 50%; animation: pulse-live 1.5s infinite; }
+
+  .bericht-kaart { padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .bericht-kaart:last-child { border-bottom: none; padding-bottom: 0; }
+  .bericht-header { margin-bottom: 8px; }
+  .bericht-titel { margin: 0 0 4px 0; color: white; font-size: 1.15rem; font-weight: 800; letter-spacing: 0.5px; }
+  .bericht-meta { font-size: 0.75rem; color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+  .bericht-tekst { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+</style>
+
+<div class="view-content-inner">
+
+  <!-- DEFAULT DASHBOARD HERO BANNER (Alleen voor bezoekers / free agents) -->
+  <div class="dash-hero" id="dash-default-hero">
+     <div class="dash-hero-content">
+        <h2>Welcome to the Ice</h2>
+        <p>Seizoen 2026-2027</p>
+     </div>
+  </div>
+
+  <!-- MY CAREER HERO BANNER (Wordt geactiveerd via JS voor ingelogde spelers) -->
+  <div class="mc-hero" id="dash-career-hero" style="display:none;">
+     <div class="mc-left" id="mc-bg">
+        <span class="material-symbols-outlined" style="position:absolute; font-size:15rem; color:white; opacity:0.03; right:-20px; top:-20px; transform:rotate(15deg); pointer-events:none;">sports_hockey</span>
+        <img src="" id="mc-foto" class="mc-avatar">
+        <div class="mc-info">
+           <div id="mc-team" style="font-size:0.9rem; font-weight:900; text-transform:uppercase; letter-spacing:2px; margin-bottom:5px;">TEAM NAAM</div>
+           <h2 id="mc-naam">SPELER NAAM</h2>
+           <div id="mc-pos" style="color:var(--text-muted); font-weight:800; font-size:1rem; text-transform:uppercase; letter-spacing:1px; margin-top:5px;">POS | #00</div>
+
+           <div class="mc-stats-grid" id="mc-stats-container">
+              <!-- Dynamische stats via JS -->
+           </div>
+        </div>
+     </div>
+     <div class="mc-right">
+        <div style="background:var(--bg); border:1px solid var(--border); padding:20px; border-radius:12px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);" id="mc-next-game">
+           <!-- Dynamische Volgende Wedstrijd via JS -->
+        </div>
+     </div>
+  </div>
+
+  <div class="widget-grid">
+
+     <div class="widget-card" id="dash-widget-join" style="display: none; grid-column: 1 / -1; background: linear-gradient(135deg, #1e3a8a 0%, var(--primary-nav) 100%); border-color: #3b82f6;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; width: 100%;">
+           <div>
+              <h3 style="margin: 0 0 8px 0; color: white; font-size: 1.5rem; font-weight: 900; display: flex; align-items: center; gap: 10px;">
+                 <span class="material-symbols-outlined" style="color: #60a5fa;">group_add</span> Free Agent?
+              </h3>
+              <p style="margin: 0; color: #93c5fd; font-size: 1rem;">Meld je direct aan bij een team om mee te spelen in de officiële league.</p>
+           </div>
+           <button class="btn" style="background: white; color: #1e40af; box-shadow: 0 4px 15px rgba(0,0,0,0.2);" onclick="document.querySelector('.nav-item[onclick*=\'Aanvragen\']').click()">Bekijk Teams</button>
+        </div>
+     </div>
+
+     <div class="widget-card" style="grid-column: 1 / -1;">
+        <div class="widget-header-row"><h3 class="widget-title"><span class="material-symbols-outlined" style="color: #3b82f6;">campaign</span> League News</h3></div>
+        <div id="nieuwsFeedContainer"><p style="color:var(--text-muted); font-style:italic;">Laatste nieuws ophalen... ⏳</p></div>
+     </div>
+
+     <div class="widget-card">
+        <div class="widget-header-row"><h3 class="widget-title"><span class="material-symbols-outlined" style="color: var(--accent);">sports_hockey</span> Live & Recent</h3></div>
+        <div id="dash-recent-games"><p style="color:var(--text-muted); font-style:italic;">Wedstrijden ophalen... ⏳</p></div>
+     </div>
+
+     <div class="widget-card">
+        <div class="widget-header-row"><h3 class="widget-title"><span class="material-symbols-outlined" style="color: var(--text-muted);">calendar_month</span> Aankomend</h3></div>
+        <div id="dash-upcoming-games"><p style="color:var(--text-muted); font-style:italic;">Wedstrijden ophalen... ⏳</p></div>
+     </div>
+
+     <div class="widget-card">
+        <div class="widget-header-row">
+           <h3 class="widget-title"><span class="material-symbols-outlined" style="color: #10b981;">leaderboard</span> Standen</h3>
+           <select class="dash-select" id="dashStandenCompetitie" onchange="dashHaalStandenOp()"><option value="">Laden...</option></select>
+        </div>
+        <table class="dash-compact-table">
+           <thead><tr><th>Team</th><th class="col-center">GP</th><th class="col-center">GD</th><th class="col-center">PTS</th></tr></thead>
+           <tbody id="dashStandenTbody"><tr><td colspan="4" class="col-center" style="color:var(--text-muted);">Selecteer een league</td></tr></tbody>
+        </table>
+     </div>
+
+     <div class="widget-card">
+        <div class="widget-header-row">
+           <h3 class="widget-title"><span class="material-symbols-outlined" style="color: #8b5cf6;">monitoring</span> Stats</h3>
+           <select class="dash-select" id="dashStatsCompetitie" onchange="dashHaalStatsOp()"><option value="">Laden...</option></select>
+        </div>
+        <div class="dash-toggle-group">
+           <button class="dash-toggle-btn active" onclick="dashZetStats('skaters', this)">Skaters</button>
+           <button class="dash-toggle-btn" onclick="dashZetStats('goalies', this)">Goalies</button>
+        </div>
+        <table class="dash-compact-table">
+           <thead id="dashStatsThead"><tr><th>Speler</th><th class="col-center">G</th><th class="col-center">A</th><th class="col-center">PTS</th></tr></thead>
+           <tbody id="dashStatsTbody"><tr><td colspan="4" class="col-center" style="color:var(--text-muted);">Selecteer een league</td></tr></tbody>
+        </table>
+     </div>
+
+  </div>
+</div>

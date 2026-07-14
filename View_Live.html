@@ -1,0 +1,403 @@
+<!-- VIEW: ADVANCED LIVE TRACKER (Premium & Klamme-Vingers Proof) -->
+<style>
+  /* Rink Specifieke Styling */
+  .rink-svg line, .rink-svg circle, .rink-svg path { stroke-width: 2.5px; vector-effect: non-scaling-stroke; }
+  .rink-marker { animation: fadeOut 1.5s forwards; pointer-events: none; border: 2px solid white; box-shadow: 0 0 8px rgba(0,0,0,0.8); }
+  @keyframes fadeOut { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(2.5); } }
+
+  /* Container en Knoppen Styling */
+  #live-app-container { min-height: max(884px, 100dvh); font-family: 'Hanken Grotesk', sans-serif; position: relative; display: flex; flex-direction: column; background-color: var(--bg); color: var(--text); }
+
+  .control-btn { background-color: var(--surface); color: var(--text-muted); border: 2px solid var(--border); font-weight: 800; font-size: 1.1rem; text-transform: uppercase; transition: 0.2s; }
+  .control-btn.active { background-color: var(--surface-hover); color: var(--accent); border-color: var(--accent); }
+
+  /* Massive Buttons voor langs het ijs */
+  .btn-massive { width: 100%; padding: 20px; font-size: 1.3rem; font-weight: 900; text-transform: uppercase; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: transform 0.1s, box-shadow 0.1s; }
+  .btn-massive:active { transform: scale(0.97); }
+
+  .btn-danger { background: #ef4444; color: white; box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4); }
+  .btn-action { background: var(--accent); color: #0a0a0a; box-shadow: 0 6px 20px rgba(255, 159, 0, 0.4); }
+
+  /* Grote dropdowns voor de modal */
+  .modal-action-btn { font-size: 1.2rem !important; padding: 15px 20px !important; font-weight: 800 !important; }
+  .huge-select { font-size: 1.1rem !important; padding: 15px !important; height: auto !important; }
+  .huge-team-btn { font-size: 1.1rem !important; padding: 15px !important; font-weight: 800 !important; }
+</style>
+
+<div id="live-app-container" class="rounded-xl overflow-hidden shadow-lg border border-outline-variant">
+
+  <!-- Whistle Modal (KLAMME VINGERS PROOF) -->
+  <div class="hidden absolute inset-0 bg-black/90 z-50 flex items-center justify-center p-2 sm:p-4" id="whistle-modal">
+    <div class="bg-surface w-full max-w-lg rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-outline-variant">
+      <div class="bg-primary-container p-5 border-b border-outline-variant flex justify-between items-center" style="background: var(--surface-hover);">
+        <h2 class="text-2xl font-bold text-white flex items-center gap-2"><span class="material-symbols-outlined" style="color:var(--accent);">sports</span> Wedstrijd Gepauzeerd</h2>
+        <button class="text-white p-2 hover:bg-surface rounded-full transition-colors" id="close-modal">
+          <span class="material-symbols-outlined" style="font-size: 28px;">close</span>
+        </button>
+      </div>
+
+      <div class="p-4 sm:p-6 flex flex-col gap-5 max-h-[80vh] overflow-y-auto">
+        <!-- Tijd Correctie (Groter) -->
+        <div class="flex items-center justify-between bg-surface-container-low p-4 rounded-xl border border-outline-variant">
+          <span class="text-lg font-bold text-on-surface">Klok Bijstellen</span>
+          <div class="flex items-center gap-4">
+            <button class="w-12 h-12 rounded-full bg-surface-hover text-white flex items-center justify-center border border-outline-variant text-xl font-bold" id="btn-minus-1s">-1s</button>
+            <span class="text-2xl font-bold w-20 text-center text-accent" id="modal-clock-display">20:00</span>
+            <button class="w-12 h-12 rounded-full bg-surface-hover text-white flex items-center justify-center border border-outline-variant text-xl font-bold" id="btn-plus-1s">+1s</button>
+          </div>
+        </div>
+
+        <!-- Actie Opties -->
+        <div class="flex flex-col gap-3">
+
+          <!-- Face-off Option -->
+          <div class="border border-outline-variant rounded-xl overflow-hidden">
+            <button class="modal-action-btn w-full text-left text-on-surface bg-surface hover:bg-surface-hover transition-colors flex justify-between items-center" data-target="faceoff-options">
+              Face-off Winnaar <span class="material-symbols-outlined transition-transform">expand_more</span>
+            </button>
+            <div class="hidden bg-surface-container-low p-4 border-t border-outline-variant" id="faceoff-options">
+              <div class="flex gap-3">
+                <button class="faceoff-log-btn huge-team-btn flex-1 bg-team-lii text-white rounded-lg shadow-sm border-2 border-transparent" data-team="HOME" id="btn-faceoff-home">THUIS</button>
+                <button class="faceoff-log-btn huge-team-btn flex-1 bg-team-tor text-white rounded-lg shadow-sm border-2 border-transparent" data-team="AWAY" id="btn-faceoff-away">UIT</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Penalty Option -->
+          <div class="border border-outline-variant rounded-xl overflow-hidden">
+            <button class="modal-action-btn w-full text-left text-on-surface bg-surface hover:bg-surface-hover transition-colors flex justify-between items-center" data-target="penalty-options">
+              Penalty (Straf) <span class="material-symbols-outlined transition-transform">expand_more</span>
+            </button>
+            <div class="hidden bg-surface-container-low p-4 border-t border-outline-variant flex flex-col gap-4" id="penalty-options">
+              <div class="flex gap-3">
+                <button class="penalty-team-btn huge-team-btn flex-1 border border-outline-variant rounded-lg hover:bg-surface-variant transition-colors text-on-surface bg-surface-variant font-bold" data-team="HOME" id="btn-penalty-home">THUIS</button>
+                <button class="penalty-team-btn huge-team-btn flex-1 border border-outline-variant rounded-lg hover:bg-surface-variant transition-colors text-on-surface" data-team="AWAY" id="btn-penalty-away">UIT</button>
+              </div>
+              <select class="penalty-log-select penalty-player-select huge-select w-full border border-outline-variant rounded-lg bg-surface text-on-surface" id="penalty-player-select"><option value="">Selecteer Speler...</option></select>
+              <select class="penalty-log-select huge-select w-full border border-outline-variant rounded-lg bg-surface text-on-surface"><option value="">Soort Straf...</option><option>Tripping</option><option>Slashing</option><option>Hooking</option><option>Holding</option><option>High-sticking</option><option>Interference</option></select>
+              <button class="btn-massive btn-action" id="log-penalty-btn">Bevestig Straf</button>
+            </div>
+          </div>
+
+          <!-- Goal Option -->
+          <div class="border border-outline-variant rounded-xl overflow-hidden">
+            <button class="modal-action-btn w-full text-left text-on-surface bg-surface hover:bg-surface-hover transition-colors flex justify-between items-center" data-target="goal-options">
+              Doelpunt (Goal) <span class="material-symbols-outlined transition-transform">expand_more</span>
+            </button>
+            <div class="hidden bg-surface-container-low p-4 border-t border-outline-variant flex flex-col gap-4" id="goal-options">
+              <div class="flex gap-3">
+                <button class="goal-team-btn huge-team-btn flex-1 border border-outline-variant rounded-lg hover:bg-surface-variant transition-colors text-on-surface bg-surface-variant font-bold" data-team="HOME" id="btn-goal-home">THUIS</button>
+                <button class="goal-team-btn huge-team-btn flex-1 border border-outline-variant rounded-lg hover:bg-surface-variant transition-colors text-on-surface" data-team="AWAY" id="btn-goal-away">UIT</button>
+              </div>
+              <select class="goal-log-select goal-player-select huge-select w-full border border-outline-variant rounded-lg bg-surface text-on-surface" id="goal-scorer-select"><option value="">Doelpuntenmaker...</option></select>
+              <select class="goal-log-select goal-player-select huge-select w-full border border-outline-variant rounded-lg bg-surface text-on-surface" id="goal-ast1-select"><option value="">1e Assist (Optioneel)...</option><option>None</option></select>
+              <select class="goal-log-select goal-player-select huge-select w-full border border-outline-variant rounded-lg bg-surface text-on-surface" id="goal-ast2-select"><option value="">2e Assist (Optioneel)...</option><option>None</option></select>
+              <button class="btn-massive btn-action" style="background:#10b981; color:white; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);" id="log-goal-btn">Goal Registreren</button>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-massive" style="background: var(--surface-hover); color: white; border: 2px solid var(--border); margin-top: 10px;" id="resume-play">
+          <span class="material-symbols-outlined">play_arrow</span> Hervat Wedstrijd
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Header & Scoreboard -->
+  <header class="flex-shrink-0 border-b border-outline-variant bg-surface">
+    <!-- Score Board Area -->
+    <div class="flex w-full h-28 bg-surface border-y border-outline-variant relative">
+      <div class="flex-1 flex flex-col items-center justify-center relative" style="background: linear-gradient(135deg, rgba(59,130,246,0.2) 0%, transparent 100%);">
+        <span class="text-3xl font-black text-white opacity-20 absolute left-4" id="home-score-icon">T</span>
+        <span class="text-5xl font-black text-white" id="score-home">0</span>
+      </div>
+
+      <div class="w-40 bg-surface flex flex-col items-center justify-center z-10 px-2 py-1 shadow-2xl border-x border-outline-variant">
+        <span class="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-1" id="display-period">1st</span>
+        <span class="text-4xl text-on-surface font-black flex items-center gap-2" id="match-clock-container">
+          <button class="text-accent hover:text-white transition-colors" id="btn-clock-toggle"><span class="material-symbols-outlined" style="font-size: 32px;">play_arrow</span></button>
+          <span id="match-clock">20:00</span>
+        </span>
+        <div class="flex justify-between w-full mt-2 text-xs font-bold text-on-surface-variant px-2 uppercase">
+          <span id="shots-home">0 SOG</span><span id="shots-away">0 SOG</span>
+        </div>
+      </div>
+
+      <div class="flex-1 flex flex-col items-center justify-center relative" style="background: linear-gradient(315deg, rgba(239,68,68,0.2) 0%, transparent 100%);">
+        <span class="text-5xl font-black text-white" id="score-away">0</span>
+        <span class="text-3xl font-black text-white opacity-20 absolute right-4" id="away-score-icon">U</span>
+      </div>
+    </div>
+
+    <!-- Title Bar -->
+    <div class="bg-surface text-center py-2 border-b border-outline-variant">
+      <h1 class="text-lg font-black tracking-wider text-white" id="match-header-title">SELECTEER WEDSTRIJD</h1>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex w-full bg-surface px-2 h-14" id="header-tabs">
+      <button class="tab-btn flex-1 flex items-center justify-center text-on-surface-variant text-sm font-black uppercase tracking-wider transition-colors" data-target="view-summary">Overzicht</button>
+      <button class="tab-btn active-tab flex-1 flex items-center justify-center text-accent border-b-4 border-accent text-sm font-black uppercase tracking-wider" data-target="view-play-by-play">Actie & IJs</button>
+      <button class="tab-btn flex-1 flex items-center justify-center text-on-surface-variant text-sm font-black uppercase tracking-wider transition-colors" data-target="view-stats">Stats</button>
+      <button class="tab-btn flex-1 flex items-center justify-center text-on-surface-variant text-sm font-black uppercase tracking-wider transition-colors" data-target="view-lines">Lines</button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 overflow-y-auto bg-bg flex flex-col p-3 gap-4 relative">
+
+    <!-- Control Bar -->
+    <div class="flex justify-between gap-3 px-1 mb-2" id="control-bar">
+      <button class="control-btn flex-1 py-3 rounded-lg" data-target="view-pre-game" id="nav-pre-game">Instellingen</button>
+      <button class="control-btn active flex-1 py-3 rounded-lg" data-target="view-match" id="nav-match">Live Registratie</button>
+      <button class="control-btn flex-1 py-3 rounded-lg" data-target="view-post-game" id="nav-post-game">Afronden</button>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- PRE GAME VIEW -->
+    <!-- ============================================== -->
+    <div class="hidden flex flex-col gap-6" id="view-pre-game">
+
+      <!-- GAS SYNC HELPER -->
+      <div class="bg-surface border border-outline-variant rounded-xl p-5 shadow-lg">
+        <h3 class="text-xl font-black text-white mb-4 flex items-center gap-2"><span class="material-symbols-outlined text-accent">cloud_download</span> Database Koppeling</h3>
+        <select id="gas-match-import" class="w-full bg-bg border border-outline-variant text-white rounded-lg py-3 px-4 text-lg font-bold">
+          <option value="">Laden...</option>
+        </select>
+      </div>
+
+      <!-- League Defaults -->
+      <div class="bg-surface border border-outline-variant rounded-xl p-5 shadow-lg flex items-center justify-between">
+        <div class="flex flex-col"><span class="text-lg font-black text-white">League Defaults</span><span class="text-sm font-bold text-text-muted">Auto-fill settings based on league rules</span></div>
+        <label class="relative inline-flex items-center cursor-pointer"><input checked="" class="sr-only peer" id="league-defaults-switch" type="checkbox"/><div class="w-14 h-7 bg-surface-hover peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-accent"></div></label>
+      </div>
+
+      <!-- 1. Match Identity -->
+      <div class="bg-surface border border-outline-variant rounded-xl p-5 shadow-lg flex flex-col gap-4">
+        <h3 class="text-lg font-black text-white border-b border-outline-variant pb-3">1. Match Identity</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Home Team</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="home-team" type="text" value="LII"/></div>
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Away Team</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="away-team" type="text" value="TOR"/></div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Season</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="season" type="text"/></div>
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">League</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="league" type="text" value="Pro League"/></div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Division</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="division" type="text" value="Eastern"/></div>
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Schedule ID</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="schedule-id" type="text"/></div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Game Date</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="game-date" type="date"/></div>
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Start Time</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="start-time" type="time"/></div>
+        </div>
+      </div>
+
+      <!-- 2. Timing & Periods -->
+      <div class="bg-surface border border-outline-variant rounded-xl p-5 shadow-lg flex flex-col gap-4">
+        <h3 class="text-lg font-black text-white border-b border-outline-variant pb-3">2. Timing & Periods</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Ruleset</label><select class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="ruleset"><option>Standard IIHF</option><option>NHL</option><option>Custom</option></select></div>
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Timing</label><select class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="timing"><option>Stop Clock</option><option>Running Clock</option></select></div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+           <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Minuten (Klok)</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="settings-minutes" type="number" value="20"/></div>
+           <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Periodes</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="settings-periods" type="number" value="3"/></div>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Lengte 1 (m)</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="period-length-1" type="number" value="20"/></div>
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Lengte 2 (m)</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="period-length-2" type="number" value="20"/></div>
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Lengte 3 (m)</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="period-length-3" type="number" value="20"/></div>
+        </div>
+        <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Penalty Registration</label><select class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="penalty-registration"><option>Standard</option><option>Running</option></select></div>
+      </div>
+
+      <!-- 3. Overtime & Shootout -->
+      <div class="bg-surface border border-outline-variant rounded-xl p-5 shadow-lg flex flex-col gap-4">
+        <h3 class="text-lg font-black text-white border-b border-outline-variant pb-3">3. Overtime & Shootout</h3>
+        <div class="flex items-center justify-between"><span class="text-sm font-bold text-text-muted uppercase">Enable Overtime</span><label class="relative inline-flex items-center cursor-pointer"><input checked="" class="sr-only peer" id="enable-overtime" type="checkbox"/><div class="w-11 h-6 bg-surface-hover rounded-full peer peer-checked:bg-accent"></div></label></div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">OT Periods</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="ot-periods" type="number" value="1"/></div>
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">OT Length (m)</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="ot-period-length" type="number" value="5"/></div>
+        </div>
+      </div>
+
+      <!-- 4. Personnel & Attendance -->
+      <div class="bg-surface border border-outline-variant rounded-xl p-5 shadow-lg flex flex-col gap-4">
+        <h3 class="text-lg font-black text-white border-b border-outline-variant pb-3">4. Personnel & Attendance</h3>
+        <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Officials</label><textarea class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="officials" rows="2"></textarea></div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Scorekeeper</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="scorekeeper" type="text"/></div>
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Expected MVP</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="expected-mvp" type="text"/></div>
+        </div>
+      </div>
+
+      <!-- 5. Team Management -->
+      <div class="bg-surface border border-outline-variant rounded-xl p-5 shadow-lg flex flex-col gap-4">
+        <h3 class="text-lg font-black text-white border-b border-outline-variant pb-3">5. Team Management</h3>
+        <div class="grid grid-cols-2 gap-4 items-center">
+          <div class="flex flex-col gap-2"><label class="text-xs font-bold text-text-muted uppercase">Salary Cap ($)</label><input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-3 w-full font-bold" id="salary-cap" type="number"/></div>
+        </div>
+      </div>
+
+      <!-- 6. Roster Management -->
+      <div class="bg-surface border border-outline-variant rounded-xl p-5 shadow-lg flex flex-col gap-4">
+        <h3 class="text-lg font-black text-white border-b border-outline-variant pb-3">6. Roster Management</h3>
+        <div class="flex flex-col gap-2">
+          <div class="flex justify-between items-center"><label class="text-xs font-bold text-text-muted uppercase" id="label-home-roster">Home Roster</label><button class="text-accent text-sm font-bold flex items-center gap-1 hover:text-white" id="btn-add-home-player"><span class="material-symbols-outlined" style="font-size: 16px;">add</span> Add Player</button></div>
+          <div class="flex flex-col gap-2 max-h-48 overflow-y-auto pr-2 border border-outline-variant rounded-lg p-3 bg-bg" id="home-roster-list"></div>
+        </div>
+        <div class="flex flex-col gap-2 mt-4">
+          <div class="flex justify-between items-center"><label class="text-xs font-bold text-text-muted uppercase" id="label-away-roster">Away Roster</label><button class="text-accent text-sm font-bold flex items-center gap-1 hover:text-white" id="btn-add-away-player"><span class="material-symbols-outlined" style="font-size: 16px;">add</span> Add Player</button></div>
+          <div class="flex flex-col gap-2 max-h-48 overflow-y-auto pr-2 border border-outline-variant rounded-lg p-3 bg-bg" id="away-roster-list"></div>
+        </div>
+      </div>
+
+      <button class="btn-massive btn-action" id="btn-save-start">
+        <span class="material-symbols-outlined">rocket_launch</span> Opslaan & Start Live Tracker
+      </button>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- MATCH VIEW (DE WERKOMGEVING) -->
+    <!-- ============================================== -->
+    <div class="flex flex-col gap-4 w-full" id="view-match">
+      <div class="flex flex-col gap-4 w-full" id="views-container">
+
+        <!-- View: Play by Play & Rink -->
+        <div class="flex flex-col gap-4 w-full" id="view-play-by-play">
+
+          <!-- HET NIEUWE EN VERBETERDE IJS (RINK) -->
+          <div class="w-full flex justify-center relative px-1 mb-2" id="rink-container">
+            <!-- Full width, controlled aspect ratio, touch-action:none voorkomt scrollen -->
+            <div class="w-full bg-[#f8fafc] relative overflow-hidden shadow-2xl"
+                 style="max-width: 1200px; aspect-ratio: 1.5 / 1; border-radius: 12%; border: 6px solid var(--primary-nav); touch-action: none;"
+                 id="interactive-rink">
+              <!-- viewBox exact houden voor de wiskunde, preserveAspectRatio stretch het perfect -->
+              <svg class="w-full h-full rink-svg" preserveAspectRatio="none" viewBox="0 0 600 400">
+                <!-- Rode middenlijn -->
+                <line stroke="#dc2626" x1="300" x2="300" y1="0" y2="400"></line>
+                <!-- Middencirkel -->
+                <circle cx="300" cy="200" fill="none" r="60" stroke="#2563eb" stroke-width="4"></circle>
+                <circle cx="300" cy="200" fill="#2563eb" r="6"></circle>
+                <!-- Blauwe lijnen -->
+                <line stroke="#2563eb" stroke-width="6" x1="200" x2="200" y1="0" y2="400"></line>
+                <line stroke="#2563eb" stroke-width="6" x1="400" x2="400" y1="0" y2="400"></line>
+                <!-- Doellijnen (Rood) -->
+                <line stroke="#dc2626" stroke-width="3" x1="30" x2="30" y1="0" y2="400"></line>
+                <line stroke="#dc2626" stroke-width="3" x1="570" x2="570" y1="0" y2="400"></line>
+                <!-- Crease (Doelgebied) -->
+                <path d="M 30 160 A 40 40 0 0 1 30 240 Z" fill="#bfdbfe" stroke="#dc2626" stroke-width="3"></path>
+                <path d="M 570 160 A 40 40 0 0 0 570 240 Z" fill="#bfdbfe" stroke="#dc2626" stroke-width="3"></path>
+                <!-- Faceoff Cirkels (Defensive Zones) -->
+                <circle cx="100" cy="100" fill="none" r="45" stroke="#dc2626"></circle><circle cx="100" cy="100" fill="#dc2626" r="4"></circle>
+                <circle cx="100" cy="300" fill="none" r="45" stroke="#dc2626"></circle><circle cx="100" cy="300" fill="#dc2626" r="4"></circle>
+                <circle cx="500" cy="100" fill="none" r="45" stroke="#dc2626"></circle><circle cx="500" cy="100" fill="#dc2626" r="4"></circle>
+                <circle cx="500" cy="300" fill="none" r="45" stroke="#dc2626"></circle><circle cx="500" cy="300" fill="#dc2626" r="4"></circle>
+                <!-- Faceoff Spots (Neutral Zone) -->
+                <circle cx="240" cy="100" fill="#dc2626" r="4"></circle><circle cx="240" cy="300" fill="#dc2626" r="4"></circle>
+                <circle cx="360" cy="100" fill="#dc2626" r="4"></circle><circle cx="360" cy="300" fill="#dc2626" r="4"></circle>
+                <!-- Onzichtbare hit area's (Zodat JS weet in welk vak we klikken) -->
+                <rect fill="transparent" height="400" id="rink-lii" width="300" x="0" y="0"></rect>
+                <rect fill="transparent" height="400" id="rink-tor" width="300" x="300" y="0"></rect>
+              </svg>
+            </div>
+          </div>
+
+          <!-- MASSIVE WHISTLE BUTTON -->
+          <div class="px-1 mt-2">
+            <button class="btn-massive btn-danger" id="btn-whistle">
+              <span class="material-symbols-outlined" style="font-size: 32px;">sports</span> WEDSTRIJD PAUZEREN
+            </button>
+            <p class="text-center text-xs text-text-muted font-bold mt-3 uppercase tracking-widest">Pauzeert klok & opent Goal/Straf/Face-off menu</p>
+          </div>
+
+          <!-- Event Log List -->
+          <div class="bg-surface border border-outline-variant rounded-xl p-5 flex flex-col gap-4 mt-4 shadow-sm" id="play-by-play-list">
+            <h3 class="text-lg font-black text-white uppercase tracking-wide border-b border-border pb-2">Actie Logboek</h3>
+          </div>
+
+          <div class="px-1 mt-6 mb-10">
+            <button class="w-full bg-surface-hover text-white py-4 rounded-xl font-bold uppercase tracking-widest border border-border hover:border-error transition-colors flex items-center justify-center gap-3" id="btn-trigger-finalize">
+              <span class="material-symbols-outlined text-error">sports_score</span> Wedstrijd Afronden
+            </button>
+          </div>
+        </div>
+
+        <!-- View: Summary -->
+        <div class="hidden flex flex-col gap-6" id="view-summary">
+          <div class="bg-surface border border-outline-variant rounded-xl p-5 shadow-lg flex flex-col gap-5">
+            <h3 class="text-xl font-black text-white uppercase tracking-widest border-b border-border pb-3">Team Vergelijking</h3>
+            <div class="flex flex-col gap-4">
+              <div class="flex items-center justify-between"><span class="text-xl font-black" style="color:#3b82f6;" id="sum-name-home">THUIS</span><span class="text-xs font-bold text-text-muted uppercase">Schoten</span><span class="text-xl font-black" style="color:#ef4444;" id="sum-name-away">UIT</span></div>
+              <div class="flex items-center justify-between text-white"><span class="text-xl font-bold" id="sum-shots-home">0</span><div class="flex-1 mx-4 h-3 bg-surface-variant rounded-full overflow-hidden flex"><div style="background:#3b82f6; width:50%;" id="sum-bar-shots-home"></div><div style="background:#ef4444; width:50%;" id="sum-bar-shots-away"></div></div><span class="text-xl font-bold" id="sum-shots-away">0</span></div>
+
+              <div class="flex items-center justify-between mt-3"><span class="text-xs font-bold text-text-muted uppercase">Face-offs Gewonnen</span></div>
+              <div class="flex items-center justify-between text-white"><span class="text-xl font-bold" id="sum-fo-home">0</span><div class="flex-1 mx-4 h-3 bg-surface-variant rounded-full overflow-hidden flex"><div style="background:#3b82f6; width:50%;" id="sum-bar-fo-home"></div><div style="background:#ef4444; width:50%;" id="sum-bar-fo-away"></div></div><span class="text-xl font-bold" id="sum-fo-away">0</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- View: Stats -->
+        <div class="hidden flex flex-col gap-4" id="view-stats">
+          <div class="bg-surface border border-outline-variant rounded-xl p-5 shadow-lg">
+            <h3 class="text-xl font-black text-white uppercase tracking-widest border-b border-border pb-3 mb-5">Statistieken Detail</h3>
+            <div class="grid grid-cols-3 gap-6 text-center items-center">
+              <div class="text-xl font-black" style="color:#3b82f6;" id="stat-hdr-home">THUIS</div><div class="text-xs font-bold text-text-muted uppercase tracking-widest">Type</div><div class="text-xl font-black" style="color:#ef4444;" id="stat-hdr-away">UIT</div>
+              <div class="text-3xl font-black text-white" id="stat-goals-home">0</div><div class="text-sm font-bold text-text-muted uppercase">Goals</div><div class="text-3xl font-black text-white" id="stat-goals-away">0</div>
+              <div class="col-span-3 h-px bg-border my-2"></div>
+              <div class="text-3xl font-black text-white" id="stat-pen-home">0</div><div class="text-sm font-bold text-text-muted uppercase">Strafminuten</div><div class="text-3xl font-black text-white" id="stat-pen-away">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- View: Lines -->
+        <div class="hidden flex flex-col gap-4" id="view-lines">
+          <div class="bg-surface border border-outline-variant rounded-xl p-5 shadow-lg">
+            <h3 class="text-xl font-black text-white uppercase tracking-widest border-b border-border pb-3 mb-5">Actieve Formaties</h3>
+            <div class="flex gap-6">
+              <div class="flex-1">
+                <h4 class="text-lg font-black mb-3 pb-2 border-b border-surface-hover" style="color:#3b82f6;" id="lines-hdr-home">THUIS</h4>
+                <div id="lines-content-home" class="text-sm font-bold text-white">Laden...</div>
+              </div>
+              <div class="w-px bg-border"></div>
+              <div class="flex-1">
+                <h4 class="text-lg font-black mb-3 pb-2 border-b border-surface-hover" style="color:#ef4444;" id="lines-hdr-away">UIT</h4>
+                <div id="lines-content-away" class="text-sm font-bold text-white">Laden...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- POST GAME VIEW -->
+    <!-- ============================================== -->
+    <div class="hidden flex flex-col gap-6" id="view-post-game">
+      <div class="bg-surface border border-outline-variant rounded-xl p-6 shadow-lg flex flex-col gap-5">
+        <h3 class="text-xl font-black text-white text-center uppercase tracking-widest border-b border-outline-variant pb-4">Wedstrijd Afronden</h3>
+
+        <div class="flex flex-col gap-2">
+           <label class="text-sm font-bold text-text-muted uppercase">Officiële Scorer (Jouw Naam)</label>
+           <input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-4 w-full text-lg" placeholder="Vul in..." type="text" id="final-scorer"/>
+        </div>
+
+        <div class="flex flex-col gap-2">
+           <label class="text-sm font-bold text-text-muted uppercase">Hoofdscheidsrechter</label>
+           <input class="bg-bg border border-outline-variant text-white rounded-lg py-3 px-4 w-full text-lg" placeholder="Vul in..." type="text" id="final-ref"/>
+        </div>
+
+        <div class="mt-6">
+          <button class="btn-massive" style="background:#10b981; color:white; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);" id="btn-postgame-finalize">
+            <span class="material-symbols-outlined">task_alt</span> Opslaan in Database
+          </button>
+          <p class="text-center text-sm text-text-muted mt-4 font-bold">Let op: Dit sluit de wedstrijd definitief af.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>

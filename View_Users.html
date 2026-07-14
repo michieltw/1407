@@ -1,0 +1,63 @@
+<!-- VIEW: GEBRUIKERS & SPELERPROFIELEN (Premium Edition) -->
+<style>
+  .admin-card { background: var(--surface); padding: 25px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 25px; }
+  .admin-title { color: white; margin-top: 0; margin-bottom: 20px; font-size: 1.2rem; border-bottom: 2px solid var(--border); padding-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 900; display:flex; align-items:center; gap:10px;}
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+  @media(max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+  .input-group label { display: block; font-size: 0.75rem; font-weight: bold; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;}
+</style>
+
+<div class="admin-card" style="border-top: 4px solid #3b82f6;">
+  <h3 class="admin-title"><span class="material-symbols-outlined" style="color:#3b82f6;">person_add</span> Nieuwe Gebruiker Aanmaken</h3>
+
+  <div class="grid-2">
+    <div class="input-group"><label>Volledige Naam</label><input type="text" id="usrNaam" placeholder="Bijv. Wayne Gretzky"></div>
+    <div class="input-group"><label>E-mailadres</label><input type="email" id="usrEmail" placeholder="wayne@nhl.com"></div>
+    <div class="input-group"><label>Rol in Applicatie</label>
+      <select id="usrRol"><option value="Speler">Speler</option><option value="Coach">Coach / Manager</option><option value="Beheerder">Beheerder</option></select>
+    </div>
+    <div class="input-group"><label>Profielfoto URL (Optioneel)</label><input type="text" id="usrFoto" placeholder="https://link-naar-foto.jpg"></div>
+  </div>
+
+  <h4 style="color:white; font-size:0.9rem; text-transform:uppercase; margin-bottom:10px; margin-top:20px;">Fysiek & Voorkeuren</h4>
+  <div class="grid-3">
+    <div class="input-group"><label>Geboortedatum</label><input type="date" id="usrGebDatum"></div>
+    <div class="input-group"><label>Lengte (cm)</label><input type="number" id="usrLengte" placeholder="185"></div>
+    <div class="input-group"><label>Gewicht (kg)</label><input type="number" id="usrGewicht" placeholder="85"></div>
+    <div class="input-group"><label>Niveau</label>
+      <select id="usrNiveau"><option value="Recreatief">Recreatief</option><option value="Amateur">Amateur</option><option value="Pro">Pro / Elite</option></select>
+    </div>
+    <div class="input-group"><label>Voorkeursnummer</label><input type="number" id="usrNummer" placeholder="99"></div>
+    <div class="input-group"><label>Schiet / Vangt</label>
+      <select id="usrHand"><option value="Links">Links (L)</option><option value="Rechts">Rechts (R)</option></select>
+    </div>
+  </div>
+
+  <h4 style="color:white; font-size:0.9rem; text-transform:uppercase; margin-bottom:10px; margin-top:20px;">Stick Specificaties (Verplicht)</h4>
+  <div class="grid-2">
+    <div class="input-group"><label>Merk</label><input type="text" id="usrStickMerk" placeholder="Bauer, CCM, Warrior..."></div>
+    <div class="input-group"><label>Model</label><input type="text" id="usrStickModel" placeholder="Nexus Tracer, Ribcor Trigger..."></div>
+    <div class="input-group"><label>Blad (Curve)</label><input type="text" id="usrStickBlad" placeholder="P92, P28, P29..."></div>
+    <div class="input-group"><label>Flex</label><input type="number" id="usrStickFlex" placeholder="77, 85, 95..."></div>
+  </div>
+
+  <button class="btn" style="width: 100%; margin-top: 15px; background:#3b82f6; color:white; box-shadow: 0 4px 15px rgba(59,130,246,0.3);" onclick="slaUserOp()" id="btnOpslaanUser">
+    <span class="material-symbols-outlined" style="vertical-align:middle; font-size:18px;">save</span> Profiel Aanmaken
+  </button>
+  <div id="userMelding" style="margin-top: 15px; font-weight: bold; text-align: center;"></div>
+</div>
+
+<div class="admin-card">
+  <h3 class="admin-title"><span class="material-symbols-outlined" style="color:var(--text-muted);">group</span> Geregistreerde Gebruikers</h3>
+  <div style="overflow-x: auto;">
+    <table class="app-table">
+      <thead>
+        <tr><th>Naam</th><th>E-mailadres</th><th>Rol</th><th>Aangemaakt</th></tr>
+      </thead>
+      <tbody id="usersTableBody">
+        <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Laden... ⏳</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>

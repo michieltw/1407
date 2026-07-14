@@ -1,0 +1,38 @@
+
+<!-- VIEW: SPELERSTATISTIEKEN & TOPSCORERS -->
+<style>
+  .stats-header { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; border-top: 4px solid var(--accent); }
+  .app-table th { text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+  .col-center { text-align: center !important; }
+  .stand-row:hover { background-color: #f8fafc; }
+  .rank-badge { display: inline-block; width: 24px; height: 24px; line-height: 24px; text-align: center; border-radius: 50%; background: #e2e8f0; color: #475569; font-weight: bold; font-size: 0.8rem; margin-right: 10px; }
+  .rank-1 { background: #fbbf24; color: #fff; } /* Goud */
+  .rank-2 { background: #94a3b8; color: #fff; } /* Zilver */
+  .rank-3 { background: #b45309; color: #fff; } /* Brons */
+  .highlight-col { background-color: #f1f5f9; font-weight: bold; color: #0f172a; }
+</style>
+
+<div class="stats-header">
+  <h3 style="margin:0;">🎯 Topscorers League</h3>
+  <p style="margin: 5px 0 0 0; color: #64748b; font-size: 0.9rem;">
+    Gebaseerd op live wedstrijd-data. Punten (PTS) = Goals (G) + Assists (A).
+  </p>
+</div>
+
+<div style="background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow: hidden;">
+  <table class="app-table" style="margin-top:0;">
+    <thead>
+      <tr>
+        <th style="width: 50px;">Rank</th>
+        <th>Speler</th>
+        <th class="col-center" title="Goals">G</th>
+        <th class="col-center" title="Assists">A</th>
+        <th class="col-center highlight-col" title="Points">PTS</th>
+        <th class="col-center" title="Penalty Minutes">PIM</th>
+      </tr>
+    </thead>
+    <tbody id="statsTableBody">
+      <!-- Wordt gevuld via JS -->
+    </tbody>
+  </table>
+</div>

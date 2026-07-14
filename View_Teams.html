@@ -1,0 +1,43 @@
+<!-- VIEW: TEAMS BEHEREN (Premium Edition) -->
+<style>
+  .admin-card { background: var(--surface); padding: 25px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 25px; }
+  .admin-title { color: white; margin-top: 0; margin-bottom: 20px; font-size: 1.2rem; border-bottom: 2px solid var(--border); padding-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 900; display:flex; align-items:center; gap:10px;}
+  .form-row { display: flex; gap: 15px; margin-bottom: 15px; }
+  .form-group { flex: 1; margin-bottom: 15px; }
+  @media(max-width: 768px) { .form-row { flex-direction: column; gap:0; } }
+  .form-group label { display: block; font-size: 0.75rem; font-weight: bold; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;}
+</style>
+
+<div class="admin-card" style="border-top: 4px solid var(--accent);">
+  <h3 class="admin-title"><span class="material-symbols-outlined" style="color:var(--accent);">shield</span> Nieuw Team Aanmaken</h3>
+
+  <div class="form-row">
+    <div class="form-group"><label>Teamnaam</label><input type="text" id="teamNaam" placeholder="Bijv. Eelde Ice Bears"></div>
+    <div class="form-group"><label>Koppel aan Competitie</label><select id="teamCompetitie"><option value="">Laden...</option></select></div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group"><label>Afkorting (Max 3 letters)</label><input type="text" id="teamAfkorting" placeholder="Bijv. EIB" maxlength="3" oninput="this.value = this.value.toUpperCase()"></div>
+    <div class="form-group"><label>Teamkleur</label><input type="color" id="teamKleur" value="#004b8d" style="padding:2px 5px; height:45px; cursor:pointer;"></div>
+    <div class="form-group"><label>Coach (Naam)</label><input type="text" id="teamCoach" placeholder="Naam van de hoofdcoach"></div>
+  </div>
+
+  <button class="btn" style="width: 100%; margin-top: 10px; box-shadow: 0 4px 15px rgba(255,159,0,0.2);" onclick="slaTeamOp()" id="btnOpslaanTeam">
+    <span class="material-symbols-outlined" style="vertical-align:middle; font-size:18px;">add_circle</span> Team Aanmaken
+  </button>
+  <div id="teamMelding" style="margin-top: 15px; font-weight: bold; text-align:center;"></div>
+</div>
+
+<div class="admin-card">
+  <h3 class="admin-title"><span class="material-symbols-outlined" style="color:var(--text-muted);">format_list_bulleted</span> Huidige Teams</h3>
+  <div style="overflow-x:auto;">
+    <table class="app-table">
+      <thead>
+        <tr><th>Team</th><th>Afkorting</th><th>Kleur</th><th>Coach</th><th>Status</th></tr>
+      </thead>
+      <tbody id="teamTableBody">
+         <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Laden... ⏳</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>

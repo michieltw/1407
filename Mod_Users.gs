@@ -1,0 +1,110 @@
+// ==========================================
+// 👤 MOD_USERS.GS - Gebruikersbeheer
+// ==========================================
+
+var Mod_Users = {
+
+  voegUserToe: function(data) {
+    const db = getDatabase();
+    const sheet = db.getSheetByName(CONFIG.TABS.USERS);
+    const dData = sheet.getDataRange().getValues();
+    for(let i = 1; i < dData.length; i++) {
+      if(dData[i][2] === data.email) return "❌ Fout: Er bestaat al een gebruiker met dit e-mailadres.";
+    }
+    const datum = new Date().toLocaleDateString('nl-NL');
+    sheet.appendRow([ Utilities.getUuid(), data.naam, data.email, data.rol, datum, data.geboortedatum, data.lengte, data.gewicht, data.hand, data.niveau, data.voorkeursnummer, data.stickMerk, data.stickModel, data.stickBlad, data.stickFlex, data.fotoUrl ]);
+    return "✅ Speler succesvol geregistreerd!";
+  },
+
+  haalAlleUsersOp: function() {
+    return getDatabase().getSheetByName(CONFIG.TABS.USERS).getDataRange().getDisplayValues();
+  },
+
+  checkMijnTeamStatus: function() {
+    try {
+      const db = getDatabase();
+      const userEmail = Session.getActiveUser().getEmail();
+      if (!userEmail) return { inTeam: false };
+      const uSheet = db.getSheetByName(CONFIG.TABS.USERS);
+      if(!uSheet) return { inTeam: false };
+      const uData = uSheet.getDataRange().getValues();
+      let myUserId = null;
+      for(let i = 1; i < uData.length; i++) { if(uData[i][2] === userEmail) { myUserId = uData[i][0]; break; } }
+      if(!myUserId) return { inTeam: false };
+      const rSheet = db.getSheetByName(CONFIG.TABS.ROSTERS);
+      if(!rSheet) return { inTeam: false };
+      const rData = rSheet.getDataRange().getValues();
+      for(let i = 1; i < rData.length; i++) { if(rData[i][2] === myUserId && rData[i][5] === 'Actief') return { inTeam: true }; }
+      return { inTeam: false };
+    } catch(e) { return { inTeam: false }; }
+  },
+
+  // HIER DE NIEUWE TOEVOEGING: Verzamel de persoonlijke 'My Career' data
+  haalMijnCareerData: function() {
+    try {
+      const db = getDatabase();
+      const userEmail = Session.getActiveUser().getEmail();
+      if (!userEmail) return null;
+
+      const uSheet = db.getSheetByName(CONFIG.TABS.USERS);
+      const uData = uSheet.getDataRange().getValues();
+      let myUser = null;
+
+      // 1. Zoek de User
+      for(let i = 1; i < uData.length; i++) {
+        if(uData[i][2] === userEmail) {
+          myUser = { id: uData[i][0], naam: uData[i][1], rol: uData[i][3], voorkeursnummer: uData[i][10], foto: uData[i][15] || '' };
+          break;
+        }
+      }
+      if(!myUser) return null;
+
+      // 2. Zoek in welk team hij/zij zit
+      const rSheet = db.getSheetByName(CONFIG.TABS.ROSTERS);
+      const rData = rSheet.getDataRange().getValues();
+      let myTeamId = null;
+      let myPos = '';
+      let myNum = myUser.voorkeursnummer;
+
+      for(let i = 1; i < rData.length; i++) {
+        if(rData[i][2] === myUser.id && rData[i][5] === 'Actief') {
+          myTeamId = rData[i][1];
+          myPos = rData[i][3];
+          myNum = rData[i][4];
+          break;
+        }
+      }
+
+      let careerData = { user: myUser, team: null, nextGame: null, stats: null, pos: myPos, num: myNum };
+
+      // 3. Als hij in een team zit, haal dan de rest op
+      if(myTeamId) {
+         const tSheet = db.getSheetByName(CONFIG.TABS.TEAMS);
+         const tData = tSheet.getDataRange().getValues();
+         for(let i=1; i<tData.length; i++) {
+            if(tData[i][0] === myTeamId) { careerData.team = { id: tData[i][0], naam: tData[i][1], afkorting: tData[i][2], kleur: tData[i][3] }; break; }
+         }
+
+         const wSheet = db.getSheetByName(CONFIG.TABS.WEDSTRIJDEN);
+         const wData = wSheet.getDataRange().getValues();
+         for(let i=1; i<wData.length; i++) {
+            if((wData[i][4] === myTeamId || wData[i][5] === myTeamId) && wData[i][6] === 'Gepland') {
+               let oppId = wData[i][4] === myTeamId ? wData[i][5] : wData[i][4];
+               let oppNaam = "Onbekend";
+               for(let j=1; j<tData.length; j++) { if(tData[j][0] === oppId) oppNaam = tData[j][1]; }
+               careerData.nextGame = { datum: wData[i][2], tijd: wData[i][3], isThuis: wData[i][4] === myTeamId, tegenstander: oppNaam };
+               break;
+            }
+         }
+
+         if (typeof Mod_Statistieken !== 'undefined') {
+            let allStats = Mod_Statistieken.haalSpelerStatsOp(null);
+            if (myPos === 'Goalie') { careerData.stats = allStats.goalies.find(g => g.naam === myUser.naam); }
+            else { careerData.stats = allStats.skaters.find(s => s.naam === myUser.naam); }
+         }
+      }
+
+      return careerData;
+    } catch(e) { return null; }
+  }
+};

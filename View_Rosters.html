@@ -1,0 +1,87 @@
+<!-- VIEW: ROSTERS BEHEREN (Premium Edition met Gastspelers) -->
+<style>
+  .roster-card { background: var(--surface); padding: 25px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 25px; }
+  .roster-title { color: white; margin-top: 0; margin-bottom: 20px; font-size: 1.2rem; border-bottom: 2px solid var(--border); padding-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 900; display:flex; align-items:center; gap:10px;}
+
+  .toggle-container { display: flex; align-items: center; justify-content: space-between; background: var(--bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px; }
+  .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--surface-hover); transition: .2s; border-radius: 34px; border: 1px solid var(--border); }
+  .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: var(--text-muted); transition: .2s; border-radius: 50%; }
+  input:checked + .slider { background-color: var(--accent); border-color: var(--accent); }
+  input:checked + .slider:before { transform: translateX(24px); background-color: #0a0a0a; }
+
+  .col-center { text-align: center; }
+</style>
+
+<div class="roster-card" style="border-top: 4px solid var(--accent);">
+  <h3 class="roster-title"><span class="material-symbols-outlined" style="color:var(--accent);">shield</span> Team Selecteren</h3>
+  <div class="form-group" style="margin-bottom:0;">
+    <label>Kies een team om het roster te beheren</label>
+    <select id="rosterSelectTeam" onchange="haalSpecifiekRosterOp()" style="font-size:1.1rem; font-weight:bold; padding:12px;">
+      <option value="">Laden...</option>
+    </select>
+  </div>
+</div>
+
+<div class="roster-card" id="addPlayerDiv" style="display:none; border-left: 4px solid #3b82f6;">
+  <h3 class="roster-title"><span class="material-symbols-outlined" style="color:#3b82f6;">person_add</span> Speler Toevoegen</h3>
+
+  <div class="toggle-container">
+     <div>
+        <div style="font-weight:bold; color:white;">Gastspeler aanmaken?</div>
+        <div style="font-size:0.75rem; color:var(--text-muted);">Zet aan als de speler nog geen eigen app-account heeft.</div>
+     </div>
+     <label class="switch">
+        <input type="checkbox" id="rosterTypeToggle" onchange="toggleRosterSpelerType()">
+        <span class="slider"></span>
+     </label>
+  </div>
+
+  <div class="grid-2">
+    <!-- Dropdown voor bestaande accounts -->
+    <div class="form-group" id="divBestaandeUser">
+      <label>Kies Geregistreerde User</label>
+      <select id="rosterSelectUser"><option value="">Laden...</option></select>
+    </div>
+
+    <!-- Invulveld voor nieuwe gastspeler -->
+    <div class="form-group" id="divNieuweSpeler" style="display:none;">
+      <label>Naam Gastspeler</label>
+      <input type="text" id="rosterNieuweNaam" placeholder="Bijv. John Doe">
+    </div>
+
+    <div class="form-group">
+      <label>Positie</label>
+      <select id="rosterPositie">
+        <option value="Forward">Forward</option>
+        <option value="Defense">Defense</option>
+        <option value="Goalie">Goalie</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group" style="max-width: 200px;">
+    <label>Rugnummer</label>
+    <input type="number" id="rosterRugnummer" placeholder="Bijv. 19" style="font-size:1.2rem; font-weight:bold; text-align:center;">
+  </div>
+
+  <button class="btn" style="background:#3b82f6; color:white; width:100%; margin-top:10px; box-shadow: 0 4px 15px rgba(59,130,246,0.3);" onclick="slaRosterOp()" id="btnOpslaanRoster">
+     <span class="material-symbols-outlined" style="vertical-align:middle; font-size:18px;">add_circle</span> Toevoegen
+  </button>
+  <div id="rosterMelding" style="margin-top: 15px; font-weight: bold; text-align:center;"></div>
+</div>
+
+<div class="roster-card">
+   <h3 class="roster-title"><span class="material-symbols-outlined" style="color:var(--text-muted);">groups</span> Huidig Team Roster</h3>
+   <div style="overflow-x:auto;">
+      <table class="app-table" style="margin-top:0;">
+        <thead>
+          <tr><th>Naam</th><th>Positie</th><th>Rugnummer</th><th>Status</th></tr>
+        </thead>
+        <tbody id="rosterTableBody">
+          <tr><td colspan="4" class="col-center" style="color:var(--text-muted);">Selecteer eerst een team hierboven.</td></tr>
+        </tbody>
+      </table>
+   </div>
+</div>
