@@ -114,5 +114,22 @@ var Mod_Live = {
     }
 
     return { stats: stats, events: events.reverse(), status: status };
+  },
+  opschonenDatabase: function() {
+    try {
+      const db = getDatabase();
+      // Example implementation: clearing old events, this could be customized
+      const sheet = db.getSheetByName(CONFIG.TABS.EVENTS);
+      if(sheet) {
+        // Just as an example, clearing rows except header
+        const lastRow = sheet.getLastRow();
+        if (lastRow > 1) {
+          sheet.deleteRows(2, lastRow - 1);
+        }
+      }
+      return "✅ Oude logs en events succesvol opgeschoond.";
+    } catch(e) {
+      return "❌ Fout: " + e.toString();
+    }
   }
 };

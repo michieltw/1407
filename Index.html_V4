@@ -103,6 +103,8 @@
 
       .form-group label, .input-group label, .pos-item label { color: var(--text-muted) !important; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem !important; }
       input, select, textarea { background-color: var(--bg) !important; color: white !important; border: 1px solid var(--border) !important; border-radius: 6px !important; padding: 12px !important; font-size: 0.95rem !important; transition: border-color 0.2s ease !important; }
+      .profiel-input { background-color: var(--bg) !important; color: white !important; border: 1px solid var(--border) !important; border-radius: 6px !important; padding: 12px !important; font-size: 0.95rem !important; width: 100%; transition: border-color 0.2s ease !important; }
+      .profiel-input:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 3px rgba(255,159,0,0.15) !important; outline: none !important; }
       input:focus, select:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 3px rgba(255,159,0,0.15) !important; outline: none !important; }
 
       .status-actief { background: rgba(34, 197, 94, 0.15) !important; color: #4ade80 !important; border: 1px solid rgba(74, 222, 128, 0.2) !important; padding: 4px 10px !important; border-radius: 6px !important; text-transform: uppercase; font-size: 0.7rem !important; letter-spacing: 0.5px; }
@@ -987,6 +989,13 @@
          checkboxes.forEach(cb => cb.checked = source.checked);
       };
 
+            window.opschonenDatabase = function() {
+         if(!confirm('Weet je zeker dat je alle oude events en logs wilt wissen? Dit kan niet ongedaan worden gemaakt.')) return;
+         google.script.run.withSuccessHandler(res => {
+            alert(res.data || res.message);
+         }).doAction('Live', 'opschonenDatabase', null);
+      };
+
       window.executeBulkAction = function() {
          const action = document.getElementById('bulkActionSelect').value;
          const value = document.getElementById('bulkActionValue').value;
@@ -1801,8 +1810,21 @@
       }
 
       function slaTeamSettingsOp() {
-         // TODO in toekomst: Add team update endpoint to Mod_Teams
-         document.getElementById('tmMelding').innerText = "✅ Team geupdate!";
+         const teamId = document.getElementById('tmSelectTeam').value;
+         if(!teamId) { alert("Selecteer een team"); return; }
+         const payload = {
+            teamId: teamId,
+            coach: document.getElementById('tmCoach').value,
+            kleur: document.getElementById('tmKleur').value
+         };
+         google.script.run.withSuccessHandler(res => {
+            document.getElementById('tmMelding').innerText = res.data || res.message;
+            if(res.status === 'success') {
+                document.getElementById('tmMelding').style.color = "#10b981";
+            } else {
+                document.getElementById('tmMelding').style.color = "#ef4444";
+            }
+         }).doAction('Teams', 'wijzigTeam', payload);
       }
 
       function initSticksScherm() {

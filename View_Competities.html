@@ -1,0 +1,45 @@
+<!-- VIEW: COMPETITIES BEHEREN -->
+<style>
+  .admin-card { background: var(--surface); padding: 25px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 25px; }
+  .admin-title { color: white; margin-top: 0; margin-bottom: 20px; font-size: 1.2rem; border-bottom: 2px solid var(--border); padding-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 900; display:flex; align-items:center; gap:10px;}
+  .form-row { display: flex; gap: 15px; margin-bottom: 15px; }
+  .form-group { flex: 1; margin-bottom: 15px; }
+  @media(max-width: 768px) { .form-row { flex-direction: column; gap:0; } }
+  .form-group label { display: block; font-size: 0.75rem; font-weight: bold; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;}
+</style>
+
+<div class="admin-card" style="border-top: 4px solid var(--accent);">
+  <h3 class="admin-title"><span class="material-symbols-outlined" style="color:var(--accent);">emoji_events</span> Nieuwe Competitie Aanmaken</h3>
+
+  <div class="form-row">
+    <div class="form-group"><label>Naam Competitie</label><input type="text" id="compNaam" placeholder="Bijv. NHL Eredivisie"></div>
+    <div class="form-group"><label>Seizoen</label><input type="text" id="compSeizoen" placeholder="Bijv. 2024-2025"></div>
+    <div class="form-group">
+      <label>Niveau / Type</label>
+      <select id="compNiveau">
+        <option value="Pro">Pro / Elite</option>
+        <option value="Amateur">Amateur</option>
+        <option value="Recreatief">Recreatief / Bierliga</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="btn" style="width: 100%; margin-top: 10px; box-shadow: 0 4px 15px rgba(255,159,0,0.2);" onclick="slaCompetitieOp()" id="btnOpslaan">
+    <span class="material-symbols-outlined" style="vertical-align:middle; font-size:18px;">add_circle</span> Competitie Aanmaken
+  </button>
+  <div id="compMelding" style="margin-top: 15px; font-weight: bold; text-align:center;"></div>
+</div>
+
+<div class="admin-card">
+  <h3 class="admin-title"><span class="material-symbols-outlined" style="color:var(--text-muted);">format_list_bulleted</span> Huidige Competities</h3>
+  <div style="overflow-x:auto;">
+    <table class="app-table">
+      <thead>
+        <tr><th>Competitie</th><th>Seizoen</th><th>Niveau</th><th>Status</th></tr>
+      </thead>
+      <tbody id="compTableBody">
+         <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Laden... ⏳</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
